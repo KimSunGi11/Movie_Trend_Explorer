@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb:latest
+    container_name: mte_db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: mte
+      MYSQL_ROOT_PASSWORD: 1234
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/config:/etc/mysql/conf.d
+      - ./db/init:/docker-entrypoint-initdb.d
+
+  backend:
+    build:
+      context: ./boot
+      dockerfile: Dockerfile
+    container_name: mte_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/mte?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./vue
+      dockerfile: Dockerfile
+    container_name: mte_frontend
+    restart: always
+    ports:
+      - "8800:80"
+    depends_on:
+      - backend
+
+volumes:
+  mariadb_data: 

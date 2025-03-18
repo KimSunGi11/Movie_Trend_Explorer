@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/moviedb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+tmdb:
+  api:
+    key: 3171cfb2f41cc3f3b1642c3460c0a0d0
+    base-url: https://api.themoviedb.org/3
+
+server:
+  port: 8080
+  servlet:
+    context-path: / 
