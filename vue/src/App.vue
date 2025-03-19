@@ -7,37 +7,28 @@
 
 <script>
 import Header from '@/components/Header.vue'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'App',
   components: {
     Header
   },
-  data() {
-    return {
-      isLoggedIn: false,
-      username: ''
-    }
+  computed: {
+    ...mapState(['user', 'token'])
   },
   created() {
     // 페이지 로드 시 로그인 상태 확인
     this.checkLoginStatus()
   },
   methods: {
+    ...mapActions(['logout']),
     checkLoginStatus() {
       const token = localStorage.getItem('token')
-      const username = localStorage.getItem('username')
-      if (token && username) {
-        this.isLoggedIn = true
-        this.username = username
+      if (token) {
+        // 토큰이 있으면 사용자 정보 가져오기
+        this.$store.dispatch('fetchUserInfo')
       }
-    },
-    handleLogout() {
-      localStorage.removeItem('token')
-      localStorage.removeItem('username')
-      this.isLoggedIn = false
-      this.username = ''
-      this.$router.push('/login')
     }
   }
 }

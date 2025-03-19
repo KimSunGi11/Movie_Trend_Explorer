@@ -39,7 +39,10 @@ export default new Vuex.Store({
     async login({ commit }, credentials) {
       const response = await axios.post('/api/auth/login', credentials)
       commit('setToken', response.data.token)
-      commit('setUser', response.data.user)
+      commit('setUser', {
+        username: response.data.username,
+        name: response.data.name
+      })
     },
     async register({ commit }, userData) {
       const response = await axios.post('/api/auth/register', userData)
@@ -81,6 +84,22 @@ export default new Vuex.Store({
     async removeFromWatchlist({ dispatch }, movieId) {
       await axios.delete(`/api/watchlist/${movieId}`)
       dispatch('fetchWatchlist')
+    },
+    async fetchUserInfo({ commit, state }) {
+      try {
+        const response = await axios.get('/api/auth/user', {
+          headers: {
+            Authorization: `Bearer ${state.token}`
+          }
+        })
+        commit('setUser', {
+          username: response.data.username,
+          name: response.data.name
+        })
+      } catch (error) {
+        console.error('Error fetching user info:', error)
+        commit('clearAuth')
+      }
     }
   },
   getters: {

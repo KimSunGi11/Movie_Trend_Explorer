@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Login',
@@ -50,18 +50,13 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['login']),
     async handleLogin() {
       try {
-        const response = await axios.post('http://localhost:8080/api/auth/login', {
+        await this.login({
           username: this.username,
           password: this.password
         })
-
-        // 토큰을 로컬 스토리지에 저장
-        localStorage.setItem('token', response.data.token)
-        localStorage.setItem('username', response.data.username)
-
-        // 홈 페이지로 리다이렉트
         this.$router.push('/')
       } catch (error) {
         this.error = '로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.'

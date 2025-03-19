@@ -16,12 +16,22 @@
             </li>
           </ul>
           <ul class="navbar-nav">
-            <li class="nav-item">
-              <router-link class="nav-link" to="/login">Login</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/signup">Join</router-link>
-            </li>
+            <template v-if="isAuthenticated">
+              <li class="nav-item">
+                <span class="nav-link">{{ currentUser.name }}</span>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" @click.prevent="handleLogout">로그아웃</a>
+              </li>
+            </template>
+            <template v-else>
+              <li class="nav-item">
+                <router-link class="nav-link" to="/login">로그인</router-link>
+              </li>
+              <li class="nav-item">
+                <router-link class="nav-link" to="/signup">회원가입</router-link>
+              </li>
+            </template>
           </ul>
         </div>
       </div>
@@ -30,8 +40,20 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
-  name: 'Header'
+  name: 'Header',
+  computed: {
+    ...mapGetters(['isAuthenticated', 'currentUser'])
+  },
+  methods: {
+    ...mapActions(['logout']),
+    async handleLogout() {
+      await this.logout()
+      this.$router.push('/login')
+    }
+  }
 }
 </script>
 
@@ -43,5 +65,9 @@ export default {
 .navbar-brand {
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.nav-link {
+  cursor: pointer;
 }
 </style> 
