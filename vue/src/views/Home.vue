@@ -41,7 +41,7 @@
         <!-- Movies Grid -->
         <div v-else class="row">
           <div v-for="movie in movies" :key="movie.id" class="col-md-3 mb-4">
-            <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card">
+            <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card" @click="goToMovieDetail(movie.id)">
               <img 
                 :src="getImageUrl(movie.poster_path)" 
                 :alt="movie.title"
@@ -88,7 +88,12 @@ export default {
       this.error = null
       
       try {
-        const response = await axios.get('http://localhost:8080/api/movies/trending')
+        const token = localStorage.getItem('token')
+        const response = await axios.get('http://localhost:8080/api/movies/trending', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
         console.log('API Response:', response.data)
         console.log('First movie:', response.data.results[0])
         console.log('First movie poster path:', response.data.results[0]?.poster_path)
@@ -103,8 +108,12 @@ export default {
           console.error('Invalid data format:', response.data)
         }
       } catch (error) {
-        this.error = '영화 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
         console.error('Error fetching movies:', error)
+        if (error.response?.status === 401) {
+          this.$router.push('/login')
+        } else {
+          this.error = '영화 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
+        }
       } finally {
         this.isLoading = false
       }
@@ -129,6 +138,9 @@ export default {
       if (this.searchQuery.trim()) {
         this.$router.push(`/search?query=${encodeURIComponent(this.searchQuery.trim())}`)
       }
+    },
+    goToMovieDetail(movieId) {
+      this.$router.push(`/movie/${movieId}`)
     }
   }
 }

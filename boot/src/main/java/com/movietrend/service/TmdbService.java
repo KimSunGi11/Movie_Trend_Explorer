@@ -18,6 +18,7 @@ public class TmdbService {
         String url = UriComponentsBuilder
             .fromHttpUrl(tmdbConfig.getBaseUrl() + "/trending/movie/week")
             .queryParam("api_key", tmdbConfig.getKey())
+            .queryParam("language", "ko-KR")
             .build()
             .toUriString();
         
@@ -33,6 +34,7 @@ public class TmdbService {
             .queryParam("api_key", tmdbConfig.getKey())
             .queryParam("query", query)
             .queryParam("page", page)
+            .queryParam("language", "ko-KR")
             .build()
             .toUriString();
         
@@ -43,6 +45,7 @@ public class TmdbService {
         String url = UriComponentsBuilder
             .fromHttpUrl(tmdbConfig.getBaseUrl() + "/movie/" + movieId)
             .queryParam("api_key", tmdbConfig.getKey())
+            .queryParam("language", "ko-KR")
             .build()
             .toUriString();
         
