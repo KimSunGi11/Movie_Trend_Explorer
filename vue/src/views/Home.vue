@@ -88,12 +88,7 @@ export default {
       this.error = null
       
       try {
-        const token = localStorage.getItem('token')
-        const response = await axios.get('http://localhost:8080/api/movies/trending', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
+        const response = await axios.get('http://localhost:8080/api/movies/trending')
         console.log('API Response:', response.data)
         console.log('First movie:', response.data.results[0])
         console.log('First movie poster path:', response.data.results[0]?.poster_path)
@@ -109,11 +104,7 @@ export default {
         }
       } catch (error) {
         console.error('Error fetching movies:', error)
-        if (error.response?.status === 401) {
-          this.$router.push('/login')
-        } else {
-          this.error = '영화 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
-        }
+        this.error = '영화 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
       } finally {
         this.isLoading = false
       }

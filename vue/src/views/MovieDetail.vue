@@ -49,6 +49,7 @@
             </div>
           </div>
         </div>
+        <CommentSection :movieId="$route.params.id" />
       </div>
     </div>
   </div>
@@ -57,9 +58,13 @@
 <script>
 import axios from 'axios'
 import NoPoster from '@/assets/no-poster.svg'
+import CommentSection from '@/components/CommentSection.vue'
 
 export default {
   name: 'MovieDetail',
+  components: {
+    CommentSection
+  },
   data() {
     return {
       movie: null,
@@ -88,20 +93,11 @@ export default {
       
       try {
         const movieId = this.$route.params.id
-        const token = localStorage.getItem('token')
-        const response = await axios.get(`http://localhost:8080/api/movies/${movieId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
+        const response = await axios.get(`http://localhost:8080/api/movies/${movieId}`)
         this.movie = response.data
       } catch (error) {
         console.error('Error fetching movie details:', error)
-        if (error.response?.status === 401) {
-          this.$router.push('/login')
-        } else {
-          this.error = '영화 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
-        }
+        this.error = '영화 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
       } finally {
         this.isLoading = false
       }

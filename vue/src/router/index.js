@@ -48,11 +48,12 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/', '/login', '/signup', '/search']
-  const authRequired = !publicPages.includes(to.path)
+  const publicPages = ['/', '/login', '/signup', '/search', '/movies', '/movie']
+  const path = to.path
+  const isPublicPage = publicPages.some(page => path.startsWith(page))
   const isAuthenticated = localStorage.getItem('token')
 
-  if (authRequired && !isAuthenticated) {
+  if (!isPublicPage && !isAuthenticated) {
     next('/login')
   } else {
     next()
