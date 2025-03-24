@@ -5,6 +5,10 @@ import Movies from '../views/Movies.vue'
 import MovieDetail from '../views/MovieDetail.vue'
 import Login from '../views/Login.vue'
 import Signup from '../views/Signup.vue'
+import Community from '../views/Community.vue'
+import PostDetail from '../views/PostDetail.vue'
+import CreatePost from '../views/CreatePost.vue'
+import Favorites from '../views/Favorites.vue'
 
 Vue.use(VueRouter)
 
@@ -38,6 +42,28 @@ const routes = [
     path: '/signup',
     name: 'Signup',
     component: Signup
+  },
+  {
+    path: '/community',
+    name: 'Community',
+    component: Community
+  },
+  {
+    path: '/community/post/:id',
+    name: 'PostDetail',
+    component: PostDetail
+  },
+  {
+    path: '/community/create',
+    name: 'CreatePost',
+    component: CreatePost,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/favorites',
+    name: 'Favorites',
+    component: Favorites,
+    meta: { requiresAuth: true }
   }
 ]
 

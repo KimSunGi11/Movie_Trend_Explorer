@@ -9,16 +9,27 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
+              <router-link class="nav-link" to="/">홈</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/community">커뮤니티</router-link>
+            </li>
+            <li class="nav-item">
               <router-link class="nav-link" to="/movies">Movies</router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/tv">TV Shows</router-link>
             </li>
+            <li class="nav-item" v-if="isAuthenticated">
+              <router-link class="nav-link" to="/favorites">
+                <i class="fas fa-heart"></i> 즐겨찾기
+              </router-link>
+            </li>
           </ul>
           <ul class="navbar-nav">
             <template v-if="isAuthenticated">
               <li class="nav-item">
-                <span class="nav-link">{{ currentUser.name }}</span>
+                <span class="nav-link">{{ currentUser?.name || '사용자' }}</span>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#" @click.prevent="handleLogout">로그아웃</a>

@@ -41,6 +41,17 @@
                 <i class="fas fa-fire"></i>
                 {{ Math.round(movie.popularity) }}
               </span>
+              <span v-if="isAuthenticated" class="favorite">
+                <button 
+                  type="button" 
+                  class="favorite-btn" 
+                  @click="toggleFavorite"
+                  :title="isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'"
+                >
+                  <i :class="['fas', isFavorite ? 'fa-star' : 'fa-star', isFavorite ? 'text-warning' : 'text-muted']"></i>
+                  <span class="favorite-count">{{ favoriteCount }}</span>
+                </button>
+              </span>
             </div>
             
             <div class="overview">
@@ -70,7 +81,9 @@ export default {
       movie: null,
       isLoading: true,
       error: null,
-      defaultPoster: NoPoster
+      defaultPoster: NoPoster,
+      isFavorite: false,
+      favoriteCount: 0
     }
   },
   computed: {
@@ -81,6 +94,9 @@ export default {
     backdropUrl() {
       if (!this.movie?.backdrop_path) return ''
       return `https://image.tmdb.org/t/p/original${this.movie.backdrop_path}`
+    },
+    isAuthenticated() {
+      return !!localStorage.getItem('token')
     }
   },
   created() {
@@ -112,6 +128,83 @@ export default {
         month: 'long',
         day: 'numeric'
       })
+    },
+    async checkFavoriteStatus() {
+      if (!this.isAuthenticated) return
+      
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get(
+          `http://localhost:8080/api/favorites/${this.movie.id}/check`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        )
+        this.isFavorite = response.data
+      } catch (error) {
+        console.error('Error checking favorite status:', error)
+      }
+    },
+    async getFavoriteCount() {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/favorites/${this.movie.id}/count`)
+        this.favoriteCount = response.data
+      } catch (error) {
+        console.error('Error getting favorite count:', error)
+      }
+    },
+    async toggleFavorite() {
+      try {
+        if (!this.isAuthenticated) {
+          this.$router.push('/login');
+          return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+          this.$router.push('/login');
+          return;
+        }
+
+        const response = await axios.post(
+          `http://localhost:8080/api/favorites/${this.movie.id}/toggle`,
+          {},
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (response.status === 200) {
+          this.isFavorite = !this.isFavorite;
+          // 즐겨찾기 카운트 업데이트
+          if (this.isFavorite) {
+            this.favoriteCount++;
+          } else {
+            this.favoriteCount--;
+          }
+        }
+      } catch (error) {
+        console.error('즐겨찾기 토글 중 오류 발생:', error);
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+        } else {
+          this.error = '즐겨찾기 상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.';
+        }
+      }
+    }
+  },
+  watch: {
+    'movie.id': {
+      handler() {
+        this.checkFavoriteStatus()
+        this.getFavoriteCount()
+      },
+      immediate: true
     }
   }
 }
@@ -264,5 +357,51 @@ h1 {
     flex-wrap: wrap;
     gap: 1rem;
   }
+}
+
+.movie-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.rating, .favorite-count {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.1);
+}
+
+.favorite-btn i {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+.favorite-btn i.text-warning {
+  color: #ffc107;
+}
+
+.favorite-count {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.favorite-btn:hover i {
+  color: #ffc107;
 }
 </style> 
