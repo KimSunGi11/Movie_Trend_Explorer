@@ -111,6 +111,11 @@ export default {
         const movieId = this.$route.params.id
         const response = await axios.get(`http://localhost:8080/api/movies/${movieId}`)
         this.movie = response.data
+        // 영화 정보를 가져온 후 즐겨찾기 상태와 카운트 가져오기
+        await Promise.all([
+          this.getFavoriteCount(),
+          this.checkFavoriteStatus()
+        ])
       } catch (error) {
         console.error('Error fetching movie details:', error)
         this.error = '영화 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
@@ -153,6 +158,7 @@ export default {
         this.favoriteCount = response.data
       } catch (error) {
         console.error('Error getting favorite count:', error)
+        this.favoriteCount = 0
       }
     },
     async toggleFavorite() {
@@ -199,10 +205,11 @@ export default {
     }
   },
   watch: {
-    'movie.id': {
-      handler() {
-        this.checkFavoriteStatus()
-        this.getFavoriteCount()
+    '$route.params.id': {
+      handler(newId) {
+        if (newId) {
+          this.fetchMovieDetails()
+        }
       },
       immediate: true
     }
