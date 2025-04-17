@@ -28,6 +28,20 @@ public class TmdbService {
         return response;
     }
 
+    public MovieListResponse getDailyTrendingMovies() {
+        String url = UriComponentsBuilder
+            .fromHttpUrl(tmdbConfig.getBaseUrl() + "/trending/movie/day")
+            .queryParam("api_key", tmdbConfig.getKey())
+            .queryParam("language", "ko-KR")
+            .build()
+            .toUriString();
+        
+        System.out.println("TMDB API URL (Daily): " + url);
+        MovieListResponse response = restTemplate.getForObject(url, MovieListResponse.class);
+        System.out.println("TMDB API Response (Daily): " + response);
+        return response;
+    }
+
     public MovieListResponse searchMovies(String query, int page) {
         String url = UriComponentsBuilder
             .fromHttpUrl(tmdbConfig.getBaseUrl() + "/search/movie")

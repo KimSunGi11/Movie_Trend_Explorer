@@ -4,8 +4,8 @@
     <section class="hero">
       <div class="container">
         <div class="hero-content text-center">
-          <h1>Welcome to Movie Trend Explorer</h1>
-          <h2>Millions of movies to discover. Explore now.</h2>
+          <h1>환영합니다</h1>
+          <h2>여러분이 원하는 영화를 찾아보세요.</h2>
           <div class="search-container">
             <input 
               type="text" 
@@ -20,10 +20,10 @@
       </div>
     </section>
 
-    <!-- Popular Movies Section -->
+    <!-- 트렌드 영화 섹션 -->
     <section class="popular-movies">
       <div class="container">
-        <h2 class="section-title">Popular Movies</h2>
+        <h2 class="section-title">트렌드</h2>
         
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-5">
@@ -61,6 +61,48 @@
         </div>
       </div>
     </section>
+
+    <!-- 인기 급상승 영화 섹션 -->
+    <section class="trending-movies">
+      <div class="container">
+        <h2 class="section-title">인기 급상승</h2>
+        
+        <!-- Loading State -->
+        <div v-if="isTrendingLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Loading trending movies...</p>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="trendingError" class="alert alert-danger" role="alert">
+          {{ trendingError }}
+        </div>
+
+        <!-- Movies Grid -->
+        <div v-else class="row">
+          <div v-for="movie in trendingMovies" :key="movie.id" class="col-md-3 mb-4">
+            <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card" @click="goToMovieDetail(movie.id)">
+              <img 
+                :src="getImageUrl(movie.poster_path)" 
+                :alt="movie.title"
+                class="movie-poster"
+                @error="handleImageError"
+              >
+              <div class="movie-info">
+                <h3 class="movie-title">{{ movie.title }}</h3>
+                <p class="movie-date">{{ formatDate(movie.release_date) }}</p>
+                <div class="movie-rating">
+                  <span class="rating">★ {{ movie.vote_average?.toFixed(1) || 'N/A' }}</span>
+                  <span class="vote-count">({{ movie.vote_count || 0 }})</span>
+                </div>
+              </div>
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -73,14 +115,18 @@ export default {
   data() {
     return {
       movies: [],
+      trendingMovies: [],
       searchQuery: '',
       isLoading: false,
+      isTrendingLoading: false,
       error: null,
+      trendingError: null,
       defaultPoster: NoPoster
     }
   },
   created() {
     this.fetchPopularMovies()
+    this.fetchTrendingMovies()
   },
   methods: {
     async fetchPopularMovies() {
@@ -99,14 +145,35 @@ export default {
             return movie
           })
         } else {
-          this.error = '영화 데이터 형식이 올바르지 않습니다.'
-          console.error('Invalid data format:', response.data)
+          this.error = '영화 데이터를 불러오는데 실패했습니다.'
         }
       } catch (error) {
-        console.error('Error fetching movies:', error)
+        console.error('Error fetching popular movies:', error)
         this.error = '영화 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
       } finally {
         this.isLoading = false
+      }
+    },
+    
+    async fetchTrendingMovies() {
+      this.isTrendingLoading = true
+      this.trendingError = null
+      
+      try {
+        const response = await axios.get('http://localhost:8080/api/movies/trending/daily')
+        
+        if (response.data && Array.isArray(response.data.results)) {
+          this.trendingMovies = response.data.results.map(movie => {
+            return movie
+          })
+        } else {
+          this.trendingError = '인기 급상승 영화 데이터를 불러오는데 실패했습니다.'
+        }
+      } catch (error) {
+        console.error('Error fetching trending movies:', error)
+        this.trendingError = '인기 급상승 영화 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
+      } finally {
+        this.isTrendingLoading = false
       }
     },
     getImageUrl(path) {

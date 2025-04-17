@@ -20,6 +20,16 @@ public class MovieController {
         return response;
     }
 
+    @GetMapping("/trending/daily")
+    public MovieListResponse getDailyTrendingMovies() {
+        MovieListResponse response = tmdbService.getDailyTrendingMovies();
+        System.out.println("Controller - Daily Total Results: " + response.getTotalResults());
+        if (!response.getResults().isEmpty()) {
+            System.out.println("Controller - Daily First Movie: " + response.getResults().get(0));
+        }
+        return response;
+    }
+
     @GetMapping("/search")
     public MovieListResponse searchMovies(
         @RequestParam(defaultValue = "") String query,

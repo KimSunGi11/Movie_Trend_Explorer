@@ -17,3 +17,7 @@ VALUES ('test@example.com', '테스트', '$2a$10$8H4.NV3Fw9YGBdHHgx4XeukqXdKUASx
 -- 관리자 계정 생성 (비밀번호: 1234)
 INSERT INTO users (username, name, email, password, role) 
 VALUES ('admin', '관리자', 'admin@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBpwTTyU3VxqW', 'ADMIN');
+
+CREATE USER IF NOT EXISTS 'mte_user'@'%' IDENTIFIED BY 'mte_password';
+GRANT ALL PRIVILEGES ON mte.* TO 'mte_user'@'%';
+FLUSH PRIVILEGES;

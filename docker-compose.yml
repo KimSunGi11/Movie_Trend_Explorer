@@ -10,13 +10,15 @@ services:
     environment:
       MYSQL_DATABASE: mte
       MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: mte_user
+      MYSQL_PASSWORD: mte_password
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./db/data:/var/lib/mysql
-      - ./db/config:/etc/mysql/conf.d
+      - mariadb_data:/var/lib/mysql
       - ./db/init:/docker-entrypoint-initdb.d
+    user: "999:999"  # mysql 사용자로 실행
 
   backend:
     build:
@@ -29,8 +31,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/mte?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATASOURCE_USERNAME=mte_user
+      - SPRING_DATASOURCE_PASSWORD=mte_password
     depends_on:
       - db
 
@@ -46,4 +48,5 @@ services:
       - backend
 
 volumes:
-  mariadb_data: 
+  mariadb_data:
+    driver: local 
