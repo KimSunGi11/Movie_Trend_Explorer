@@ -42,15 +42,16 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long commentId, String username) {
-        Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-
-        if (!comment.getUser().getUsername().equals(username)) {
-            throw new IllegalStateException("You can only delete your own comments");
-        }
-
+    public void deleteComment(Long id) {
+        Comment comment = commentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         commentRepository.delete(comment);
+    }
+
+    public boolean isCommentOwner(Long commentId, String username) {
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+        return comment.getUser().getUsername().equals(username);
     }
 
     private CommentDto convertToDto(Comment comment) {

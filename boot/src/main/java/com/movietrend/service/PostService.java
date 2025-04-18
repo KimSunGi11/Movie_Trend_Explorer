@@ -70,14 +70,9 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long id, String username) {
+    public void deletePost(Long id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-
-        if (!post.getUser().getUsername().equals(username)) {
-            throw new IllegalStateException("You can only delete your own posts");
-        }
-
+            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         postRepository.delete(post);
     }
 
@@ -111,6 +106,12 @@ public class PostService {
         }
 
         postCommentRepository.delete(comment);
+    }
+
+    public boolean isPostOwner(Long postId, String username) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        return post.getUser().getUsername().equals(username);
     }
 
     private PostDto convertToDto(Post post) {

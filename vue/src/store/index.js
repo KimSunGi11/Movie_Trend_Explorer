@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    isLoggedIn: false,
     user: null,
     token: localStorage.getItem('token') || null,
     movies: [],
@@ -13,14 +14,22 @@ export default new Vuex.Store({
     currentMovie: null
   },
   mutations: {
+    setLoggedIn(state, value) {
+      state.isLoggedIn = value
+    },
     setUser(state, user) {
       state.user = user
     },
     setToken(state, token) {
       state.token = token
-      localStorage.setItem('token', token)
+      if (token) {
+        localStorage.setItem('token', token)
+      } else {
+        localStorage.removeItem('token')
+      }
     },
-    clearAuth(state) {
+    logout(state) {
+      state.isLoggedIn = false
       state.user = null
       state.token = null
       localStorage.removeItem('token')
@@ -36,6 +45,27 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    async initializeAuth({ commit, state }) {
+      const token = state.token
+      if (token) {
+        try {
+          const response = await fetch('http://localhost:8080/api/auth/user', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          if (response.ok) {
+            const user = await response.json()
+            commit('setUser', user)
+            commit('setLoggedIn', true)
+          } else {
+            commit('logout')
+          }
+        } catch (error) {
+          commit('logout')
+        }
+      }
+    },
     async login({ commit }, credentials) {
       const response = await axios.post('/api/auth/login', credentials)
       commit('setToken', response.data.token)
@@ -50,7 +80,7 @@ export default new Vuex.Store({
       commit('setUser', response.data.user)
     },
     logout({ commit }) {
-      commit('clearAuth')
+      commit('logout')
     },
     async fetchMovies({ commit }, { page = 1, query = '' }) {
       try {
@@ -98,13 +128,14 @@ export default new Vuex.Store({
         })
       } catch (error) {
         console.error('Error fetching user info:', error)
-        commit('clearAuth')
+        commit('logout')
       }
     }
   },
   getters: {
-    isAuthenticated: state => !!state.token,
+    isAuthenticated: state => state.isLoggedIn,
     currentUser: state => state.user,
+    isAdmin: state => state.user && state.user.role === 'ADMIN',
     movies: state => state.movies,
     currentMovie: state => state.currentMovie,
     watchlist: state => state.watchlist

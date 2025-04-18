@@ -150,17 +150,18 @@ public class AuthController {
     @GetMapping("/user")
     public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
         try {
-            String username = jwtService.extractUsername(token.substring(7));
+            String jwt = token.substring(7);
+            String username = jwtService.extractUsername(jwt);
             User user = userService.findByUsername(username);
             
-            Map<String, String> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("username", user.getUsername());
             response.put("name", user.getName());
+            response.put("role", user.getRole());
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Error fetching user info", e);
-            return ResponseEntity.status(401).body("인증되지 않은 요청입니다.");
+            return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.");
         }
     }
 } 

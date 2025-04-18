@@ -9,6 +9,7 @@ import Community from '../views/Community.vue'
 import PostDetail from '../views/PostDetail.vue'
 import CreatePost from '../views/CreatePost.vue'
 import Favorites from '../views/Favorites.vue'
+import Admin from '../views/Admin.vue'
 
 Vue.use(VueRouter)
 
@@ -64,6 +65,12 @@ const routes = [
     name: 'Favorites',
     component: Favorites,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin,
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 

@@ -41,12 +41,12 @@
         <div class="comment-header">
           <span class="user-name">{{ comment.name }}</span>
           <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
-          <button
-            v-if="isAuthenticated && currentUsername === comment.username"
+          <button 
+            v-if="isAdmin || comment.username === currentUser?.username"
             @click="deleteComment(comment.id)"
-            class="btn btn-sm btn-danger"
+            class="delete-btn"
           >
-            삭제
+            <i class="fas fa-trash"></i>
           </button>
         </div>
         <div class="comment-content">{{ comment.content }}</div>
@@ -56,13 +56,14 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import axios from 'axios'
 
 export default {
   name: 'CommentSection',
   props: {
     movieId: {
-      type: [Number, String],
+      type: Number,
       required: true
     }
   },
@@ -70,24 +71,19 @@ export default {
     return {
       comments: [],
       newComment: '',
-      isLoading: false,
+      loading: true,
       error: null
     }
   },
   computed: {
-    isAuthenticated() {
-      return !!localStorage.getItem('token')
-    },
-    currentUsername() {
-      return localStorage.getItem('username')
-    }
+    ...mapGetters(['isAuthenticated', 'currentUser', 'isAdmin'])
   },
   created() {
     this.fetchComments()
   },
   methods: {
     async fetchComments() {
-      this.isLoading = true
+      this.loading = true
       this.error = null
       
       try {
@@ -97,7 +93,7 @@ export default {
         console.error('Error fetching comments:', error)
         this.error = '댓글을 불러오는데 실패했습니다.'
       } finally {
-        this.isLoading = false
+        this.loading = false
       }
     },
     async submitComment() {
@@ -134,23 +130,19 @@ export default {
       }
     },
     async deleteComment(commentId) {
-      if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) return
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
       
       try {
-        const token = localStorage.getItem('token')
-        await axios.delete(
-          `http://localhost:8080/api/movies/${this.movieId}/comments/${commentId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
+        const token = localStorage.getItem('token');
+        await axios.delete(`http://localhost:8080/api/comments/${commentId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        )
-        
-        await this.fetchComments()
+        });
+        this.comments = this.comments.filter(comment => comment.id !== commentId);
       } catch (error) {
-        console.error('Error deleting comment:', error)
-        this.error = '댓글 삭제에 실패했습니다.'
+        console.error('댓글 삭제 실패:', error);
+        alert('댓글 삭제에 실패했습니다.');
       }
     },
     formatDate(date) {
@@ -222,5 +214,19 @@ export default {
 .btn-danger {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+  transition: color 0.2s;
+}
+
+.delete-btn:hover {
+  color: #c82333;
 }
 </style> 

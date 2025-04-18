@@ -39,6 +39,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import axios from 'axios'
 
 export default {
   name: 'Login',
@@ -53,11 +54,33 @@ export default {
     ...mapActions(['login']),
     async handleLogin() {
       try {
-        await this.login({
+        const response = await axios.post('http://localhost:8080/api/auth/login', {
           username: this.username,
           password: this.password
-        })
-        this.$router.push('/')
+        });
+        
+        console.log('Login response:', response.data); // 로그인 응답 확인
+        
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+        
+        // 사용자 정보 가져오기
+        const userResponse = await axios.get('http://localhost:8080/api/auth/user', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        console.log('User info response:', userResponse.data); // 사용자 정보 응답 확인
+        
+        // Vuex store에 사용자 정보 저장
+        this.$store.commit('setUser', userResponse.data);
+        this.$store.commit('setLoggedIn', true);
+        this.$store.commit('setToken', token);
+        
+        console.log('Store state after login:', this.$store.state); // store 상태 확인
+        
+        this.$router.push('/');
       } catch (error) {
         this.error = '로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.'
         console.error('Login error:', error)

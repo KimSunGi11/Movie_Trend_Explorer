@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mariadb://db:3306/moviedb
-    username: root
-    password: root
+    url: jdbc:mariadb://db:3306/mte
+    username: mte_user
+    password: mte_password
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
@@ -10,13 +10,17 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
+        format_sql: true
+
+jwt:
+  secret: your-256-bit-secret
+  expiration: 86400000
 
 tmdb:
-  api:
-    key: 3171cfb2f41cc3f3b1642c3460c0a0d0
-    base-url: https://api.themoviedb.org/3
+  api-key: ${TMDB_API_KEY}
+  base-url: https://api.themoviedb.org/3
+  image-base-url: https://image.tmdb.org/t/p/
 
 server:
   port: 8080

@@ -21,8 +21,13 @@
               <router-link class="nav-link" to="/tv">TV Shows</router-link>
             </li>
             <li class="nav-item" v-if="isAuthenticated">
-              <router-link class="nav-link" to="/favorites">
+              <router-link to="/favorites" class="nav-link">
                 <i class="fas fa-heart"></i> 즐겨찾기
+              </router-link>
+            </li>
+            <li class="nav-item" v-if="isAdmin">
+              <router-link to="/admin" class="nav-link admin-link">
+                <i class="fas fa-user-shield"></i> 관리자 페이지
               </router-link>
             </li>
           </ul>
@@ -56,7 +61,14 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'Header',
   computed: {
-    ...mapGetters(['isAuthenticated', 'currentUser'])
+    ...mapGetters(['isAuthenticated', 'currentUser', 'isAdmin'])
+  },
+  watch: {
+    isAuthenticated(newVal) {
+      console.log('isAuthenticated changed:', newVal);
+      console.log('currentUser:', this.currentUser);
+      console.log('isAdmin:', this.isAdmin);
+    }
   },
   methods: {
     ...mapActions(['logout']),
@@ -80,5 +92,14 @@ export default {
 
 .nav-link {
   cursor: pointer;
+}
+
+.admin-link {
+  color: #ffd700 !important;
+  font-weight: bold;
+}
+
+.admin-link:hover {
+  color: #ffed4a !important;
 }
 </style> 

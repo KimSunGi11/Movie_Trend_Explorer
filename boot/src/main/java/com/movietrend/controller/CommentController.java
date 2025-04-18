@@ -6,6 +6,7 @@ import com.movietrend.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,14 +33,14 @@ public class CommentController {
         return ResponseEntity.ok(comment);
     }
 
-    @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteComment(
-        @PathVariable Long movieId,
-        @PathVariable Long commentId,
-        Authentication authentication
-    ) {
-        String userEmail = authentication.getName();
-        commentService.deleteComment(commentId, userEmail);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @commentService.isCommentOwner(#id, authentication.principal.username)")
+    public ResponseEntity<?> deleteComment(@PathVariable Long id) {
+        try {
+            commentService.deleteComment(id);
+            return ResponseEntity.ok().body("댓글이 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("댓글 삭제에 실패했습니다.");
+        }
     }
 } 

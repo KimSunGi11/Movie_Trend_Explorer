@@ -18,15 +18,18 @@
             <span class="author">{{ post.name }}</span>
             <span class="date">{{ formatDate(post.createdAt) }}</span>
             <span class="views">조회 {{ post.viewCount }}</span>
+            <button 
+              v-if="isAdmin || post.username === currentUser?.username"
+              @click="deletePost"
+              class="delete-btn"
+            >
+              <i class="fas fa-trash"></i> 삭제
+            </button>
           </div>
         </div>
 
         <div class="post-body">
           {{ post.content }}
-        </div>
-
-        <div class="post-actions" v-if="isAuthenticated && currentUsername === post.username">
-          <button class="btn btn-danger" @click="deletePost">삭제</button>
         </div>
 
         <div class="comments-section mt-4">
@@ -62,11 +65,11 @@
                 <span class="user-name">{{ comment.name }}</span>
                 <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
                 <button
-                  v-if="isAuthenticated && currentUsername === comment.username"
+                  v-if="isAdmin || comment.username === currentUser?.username"
                   @click="deleteComment(comment.id)"
-                  class="btn btn-sm btn-danger"
+                  class="delete-btn"
                 >
-                  삭제
+                  <i class="fas fa-trash"></i>
                 </button>
               </div>
               <div class="comment-content">{{ comment.content }}</div>
@@ -80,6 +83,7 @@
 
 <script>
 import axios from 'axios'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PostDetail',
@@ -88,16 +92,13 @@ export default {
       post: null,
       isLoading: false,
       error: null,
-      newComment: ''
+      newComment: '',
+      comments: [],
+      loading: true
     }
   },
   computed: {
-    isAuthenticated() {
-      return !!localStorage.getItem('token')
-    },
-    currentUsername() {
-      return localStorage.getItem('username')
-    }
+    ...mapGetters(['isAuthenticated', 'currentUser', 'isAdmin'])
   },
   created() {
     this.fetchPost()
@@ -292,5 +293,19 @@ export default {
 .btn-danger {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+  transition: color 0.2s;
+}
+
+.delete-btn:hover {
+  color: #c82333;
 }
 </style> 

@@ -17,9 +17,8 @@ export default {
   computed: {
     ...mapState(['user', 'token'])
   },
-  created() {
-    // 페이지 로드 시 로그인 상태 확인
-    this.checkLoginStatus()
+  async created() {
+    await this.$store.dispatch('initializeAuth')
   },
   methods: {
     ...mapActions(['logout']),
