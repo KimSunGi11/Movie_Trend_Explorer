@@ -1,10 +1,15 @@
 package com.movietrend.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.movietrend.service.TmdbService;
 import com.movietrend.dto.MovieListResponse;
 import com.movietrend.dto.MovieDto;
+import com.movietrend.dto.GenreDto;
+import com.movietrend.dto.MovieSearchResponse;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -41,5 +46,31 @@ public class MovieController {
     @GetMapping("/{id}")
     public MovieDto getMovieDetails(@PathVariable Long id) {
         return tmdbService.getMovieDetails(id);
+    }
+
+    @GetMapping("/genres")
+    public ResponseEntity<List<GenreDto>> getGenres() {
+        return ResponseEntity.ok(tmdbService.getGenres());
+    }
+
+    @GetMapping("/discover")
+    public ResponseEntity<MovieSearchResponse> discoverMovies(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) String sort_by,
+            @RequestParam(required = false) String with_genres,
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) Double vote_average_gte,
+            @RequestParam(required = false) Integer vote_count_gte,
+            @RequestParam(required = false) Integer with_runtime_gte,
+            @RequestParam(required = false) Integer with_runtime_lte,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer min_favorite_count) {
+        
+        return ResponseEntity.ok(tmdbService.discoverMovies(
+            page, sort_by, with_genres, language, 
+            vote_average_gte, vote_count_gte,
+            with_runtime_gte, with_runtime_lte, keyword,
+            min_favorite_count
+        ));
     }
 } 

@@ -15,10 +15,9 @@
               <router-link class="nav-link" to="/community">커뮤니티</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/movies">Movies</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/tv">TV Shows</router-link>
+              <router-link class="nav-link" to="/advanced-search">
+                <i class="fas fa-search"></i> 영화찾기
+              </router-link>
             </li>
             <li class="nav-item" v-if="isAuthenticated">
               <router-link to="/favorites" class="nav-link">

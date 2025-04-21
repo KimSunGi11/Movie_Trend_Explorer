@@ -18,23 +18,23 @@
       </div>
 
       <div v-else class="row">
-        <div v-for="movie in favoriteMovies" :key="movie.id" class="col-md-4 mb-4">
-          <div class="card h-100">
-            <img :src="movie.posterPath" class="card-img-top" :alt="movie.title">
-            <div class="card-body">
-              <h5 class="card-title">{{ movie.title }}</h5>
-              <p class="card-text">{{ movie.overview }}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="rating">
-                  <i class="fas fa-star text-warning"></i>
-                  <span class="ms-1">{{ movie.voteAverage }}</span>
-                </div>
-                <button class="btn btn-outline-danger" @click="removeFavorite(movie.id)">
-                  <i class="fas fa-heart"></i>
-                </button>
+        <div v-for="movie in favoriteMovies" :key="movie.id" class="col-md-3 mb-4">
+          <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card">
+            <img 
+              :src="getImageUrl(movie.poster_path)" 
+              :alt="movie.title"
+              class="movie-poster"
+              @error="handleImageError"
+            >
+            <div class="movie-info">
+              <h3 class="movie-title">{{ movie.title }}</h3>
+              <p class="movie-date">{{ formatDate(movie.release_date) }}</p>
+              <div class="movie-rating">
+                <span class="rating">★ {{ movie.vote_average?.toFixed(1) || 'N/A' }}</span>
+                <span class="vote-count">({{ movie.vote_count || 0 }})</span>
               </div>
             </div>
-          </div>
+          </router-link>
         </div>
       </div>
     </div>
@@ -43,6 +43,7 @@
 
 <script>
 import axios from 'axios'
+import NoPoster from '@/assets/no-poster.svg'
 
 export default {
   name: 'Favorites',
@@ -50,7 +51,8 @@ export default {
     return {
       favoriteMovies: [],
       isLoading: false,
-      error: null
+      error: null,
+      defaultPoster: NoPoster
     }
   },
   created() {
@@ -94,24 +96,20 @@ export default {
       const response = await axios.get(`http://localhost:8080/api/movies/${movieId}`)
       return response.data
     },
-    async removeFavorite(movieId) {
-      try {
-        const token = localStorage.getItem('token')
-        await axios.post(
-          `http://localhost:8080/api/favorites/${movieId}/toggle`,
-          {},
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
-        )
-        
-        this.favoriteMovies = this.favoriteMovies.filter(movie => movie.id !== movieId)
-      } catch (error) {
-        console.error('Error removing favorite:', error)
-        this.error = '즐겨찾기 해제에 실패했습니다.'
-      }
+    getImageUrl(path) {
+      if (!path) return this.defaultPoster
+      return `https://image.tmdb.org/t/p/w500${path}`
+    },
+    handleImageError(e) {
+      e.target.src = this.defaultPoster
+    },
+    formatDate(date) {
+      if (!date) return '개봉일 정보 없음'
+      return new Date(date).toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
     }
   }
 }
@@ -122,44 +120,57 @@ export default {
   padding: 2rem 0;
 }
 
-.card {
+.movie-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+  height: 100%;
 }
 
-.card:hover {
+.movie-card:hover {
   transform: translateY(-5px);
 }
 
-.card-img-top {
-  height: 400px;
+.movie-poster {
+  width: 100%;
+  height: 360px;
   object-fit: cover;
 }
 
-.card-title {
-  font-size: 1.1rem;
+.movie-info {
+  padding: 1rem;
+}
+
+.movie-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.movie-date {
+  color: #666;
+  font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
 
-.card-text {
-  font-size: 0.9rem;
-  color: #6c757d;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.movie-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .rating {
+  color: #f5c518;
+  font-weight: 600;
+}
+
+.vote-count {
+  color: #666;
   font-size: 0.9rem;
-  color: #ffc107;
-}
-
-.btn-outline-danger {
-  padding: 0.25rem 0.5rem;
-}
-
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: white;
 }
 </style> 

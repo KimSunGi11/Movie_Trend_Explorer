@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
@@ -9,7 +9,7 @@ services:
       - "3306:3306"
     environment:
       MYSQL_DATABASE: mte
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: mte_user
       MYSQL_PASSWORD: mte_password
     command:
@@ -30,9 +30,10 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/mte?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/mte
       - SPRING_DATASOURCE_USERNAME=mte_user
       - SPRING_DATASOURCE_PASSWORD=mte_password
+      - TMDB_API_KEY=3171cfb2f41cc3f3b1642c3460c0a0d0
     depends_on:
       - db
 

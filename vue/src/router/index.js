@@ -10,6 +10,7 @@ import PostDetail from '../views/PostDetail.vue'
 import CreatePost from '../views/CreatePost.vue'
 import Favorites from '../views/Favorites.vue'
 import Admin from '../views/Admin.vue'
+import AdvancedSearch from '@/views/AdvancedSearch.vue'
 
 Vue.use(VueRouter)
 
@@ -71,6 +72,11 @@ const routes = [
     name: 'Admin',
     component: Admin,
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/advanced-search',
+    name: 'AdvancedSearch',
+    component: AdvancedSearch
   }
 ]
 
