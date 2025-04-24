@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    container_name: mte_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
   db:
     image: mariadb:latest
     container_name: mte_db
@@ -19,6 +33,8 @@ services:
       - mariadb_data:/var/lib/mysql
       - ./db/init:/docker-entrypoint-initdb.d
     user: "999:999"  # mysql 사용자로 실행
+    networks:
+      - elastic
 
   backend:
     build:
@@ -34,8 +50,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=mte_user
       - SPRING_DATASOURCE_PASSWORD=mte_password
       - TMDB_API_KEY=3171cfb2f41cc3f3b1642c3460c0a0d0
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
     depends_on:
       - db
+      - elasticsearch
+    networks:
+      - elastic
 
   frontend:
     build:
@@ -47,7 +68,15 @@ services:
       - "8800:80"
     depends_on:
       - backend
+    networks:
+      - elastic
 
 volumes:
   mariadb_data:
-    driver: local 
+    driver: local
+  elasticsearch_data:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge 

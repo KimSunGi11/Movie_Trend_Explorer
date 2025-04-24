@@ -6,16 +6,7 @@
         <div class="hero-content text-center">
           <h1>환영합니다</h1>
           <h2>여러분이 원하는 영화를 찾아보세요.</h2>
-          <div class="search-container">
-            <input 
-              type="text" 
-              class="form-control search-input" 
-              placeholder="Search for a movie..."
-              v-model="searchQuery"
-              @keyup.enter="handleSearch"
-            >
-            <button class="btn btn-primary search-button" @click="handleSearch">Search</button>
-          </div>
+          <SearchBar />
         </div>
       </div>
     </section>
@@ -109,14 +100,17 @@
 <script>
 import axios from 'axios'
 import NoPoster from '@/assets/no-poster.svg'
+import SearchBar from '@/components/SearchBar.vue'
 
 export default {
   name: 'Home',
+  components: {
+    SearchBar
+  },
   data() {
     return {
       movies: [],
       trendingMovies: [],
-      searchQuery: '',
       isLoading: false,
       isTrendingLoading: false,
       error: null,
@@ -191,11 +185,6 @@ export default {
         month: 'long',
         day: 'numeric'
       })
-    },
-    handleSearch() {
-      if (this.searchQuery.trim()) {
-        this.$router.push(`/search?query=${encodeURIComponent(this.searchQuery.trim())}`)
-      }
     },
     goToMovieDetail(movieId) {
       this.$router.push(`/movie/${movieId}`)

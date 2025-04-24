@@ -8,6 +8,8 @@ import com.movietrend.dto.MovieDto;
 import com.movietrend.dto.GenreDto;
 import com.movietrend.dto.MovieSearchResponse;
 import lombok.RequiredArgsConstructor;
+import com.movietrend.service.MovieSearchService;
+import com.movietrend.document.MovieDocument;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MovieController {
     private final TmdbService tmdbService;
+    private final MovieSearchService movieSearchService;
 
     @GetMapping("/trending")
     public MovieListResponse getTrendingMovies() {
@@ -72,5 +75,10 @@ public class MovieController {
             with_runtime_gte, with_runtime_lte, keyword,
             min_favorite_count
         ));
+    }
+
+    @GetMapping("/autocomplete")
+    public ResponseEntity<List<MovieDto>> autocomplete(@RequestParam String query) {
+        return ResponseEntity.ok(movieSearchService.autocomplete(query));
     }
 } 
