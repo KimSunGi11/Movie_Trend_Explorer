@@ -16,13 +16,13 @@ public class MovieDocument {
     @Id
     private Long id;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "standard")
     private String title;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "standard")
     private String originalTitle;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "standard")
     private String overview;
 
     @Field(type = FieldType.Keyword)
@@ -31,7 +31,7 @@ public class MovieDocument {
     @Field(type = FieldType.Keyword)
     private String backdropPath;
 
-    @Field(type = FieldType.Date)
+    @Field(type = FieldType.Keyword)
     private String releaseDate;
 
     @Field(type = FieldType.Double)

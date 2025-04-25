@@ -25,9 +25,11 @@ public class MovieSearchService {
     }
 
     public List<MovieDto> autocomplete(String query) {
-        Criteria criteria = new Criteria("title").startsWith(query);
+        Criteria criteria = new Criteria("title").startsWith(query)
+            .or("suggestions").startsWith(query);
+        
         CriteriaQuery searchQuery = new CriteriaQuery(criteria);
-        searchQuery.setPageable(PageRequest.of(0, 5));
+        searchQuery.setPageable(PageRequest.of(0, 10));
 
         SearchHits<MovieDocument> searchHits = elasticsearchOperations.search(searchQuery, MovieDocument.class);
         return searchHits.stream()

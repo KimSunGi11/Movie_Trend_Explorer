@@ -192,4 +192,24 @@ public class TmdbService {
         dto.setPopularity(((Number) movie.get("popularity")).doubleValue());
         return dto;
     }
+
+    public MovieSearchResponse getNowPlayingMovies(int page) {
+        String url = String.format("%s/movie/now_playing?api_key=%s&language=ko-KR&page=%d", tmdbConfig.getBaseUrl(), tmdbConfig.getKey(), page);
+        return restTemplate.getForObject(url, MovieSearchResponse.class);
+    }
+
+    public MovieSearchResponse getPopularMovies(int page) {
+        String url = String.format("%s/movie/popular?api_key=%s&language=ko-KR&page=%d", tmdbConfig.getBaseUrl(), tmdbConfig.getKey(), page);
+        return restTemplate.getForObject(url, MovieSearchResponse.class);
+    }
+
+    public MovieSearchResponse getTopRatedMovies(int page) {
+        String url = String.format("%s/movie/top_rated?api_key=%s&language=ko-KR&page=%d", tmdbConfig.getBaseUrl(), tmdbConfig.getKey(), page);
+        return restTemplate.getForObject(url, MovieSearchResponse.class);
+    }
+
+    public MovieSearchResponse getUpcomingMovies(int page) {
+        String url = String.format("%s/movie/upcoming?api_key=%s&language=ko-KR&page=%d", tmdbConfig.getBaseUrl(), tmdbConfig.getKey(), page);
+        return restTemplate.getForObject(url, MovieSearchResponse.class);
+    }
 } 

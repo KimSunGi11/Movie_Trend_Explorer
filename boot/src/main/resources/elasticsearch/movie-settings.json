@@ -8,6 +8,11 @@
           "stop",
           "trim"
         ]
+      },
+      "edge_ngram_analyzer": {
+        "type": "custom",
+        "tokenizer": "edge_ngram_tokenizer",
+        "filter": ["lowercase"]
       }
     },
     "filter": {
@@ -15,6 +20,14 @@
         "type": "edge_ngram",
         "min_gram": 1,
         "max_gram": 20
+      }
+    },
+    "tokenizer": {
+      "edge_ngram_tokenizer": {
+        "type": "edge_ngram",
+        "min_gram": 1,
+        "max_gram": 50,
+        "token_chars": ["letter", "digit"]
       }
     }
   }

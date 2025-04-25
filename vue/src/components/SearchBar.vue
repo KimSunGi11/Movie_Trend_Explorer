@@ -5,6 +5,9 @@
         type="text"
         v-model="searchQuery"
         @input="onInput"
+        @compositionstart="onCompositionStart"
+        @compositionupdate="onCompositionUpdate"
+        @compositionend="onCompositionEnd"
         @keyup.enter="search"
         placeholder="영화 검색..."
         class="search-input"
@@ -45,34 +48,61 @@ export default {
     return {
       searchQuery: '',
       suggestions: [],
-      showSuggestions: false
+      showSuggestions: false,
+      isComposing: false,
+      composingText: ''
     }
   },
   methods: {
-    onInput: debounce(async function() {
-      if (this.searchQuery.length < 2) {
+    onCompositionStart(e) {
+      this.isComposing = true
+      this.composingText = e.data
+    },
+    onCompositionUpdate(e) {
+      this.composingText = e.data
+      this.fetchSuggestions(this.composingText)
+    },
+    onCompositionEnd(e) {
+      this.isComposing = false
+      this.composingText = ''
+      this.searchQuery = e.target.value
+      this.fetchSuggestions(this.searchQuery)
+    },
+    onInput: debounce(function(e) {
+      if (!this.isComposing) {
+        this.searchQuery = e.target.value
+        this.fetchSuggestions(this.searchQuery)
+      }
+    }, 300),
+    fetchSuggestions(query) {
+      if (query.length < 1) {
         this.suggestions = []
         this.showSuggestions = false
         return
       }
 
       try {
-        const response = await axios.get(`http://localhost:8080/api/movies/autocomplete?query=${encodeURIComponent(this.searchQuery)}`)
-        this.suggestions = response.data
-        this.showSuggestions = true
+        axios.get(`http://localhost:8080/api/movies/autocomplete?query=${encodeURIComponent(query)}`)
+          .then(response => {
+            this.suggestions = response.data.slice(0, 10) // 최대 10개로 제한
+            this.showSuggestions = true
+          })
+          .catch(error => {
+            console.error('Error fetching suggestions:', error)
+            this.suggestions = []
+            this.showSuggestions = false
+          })
       } catch (error) {
         console.error('Error fetching suggestions:', error)
         this.suggestions = []
         this.showSuggestions = false
       }
-    }, 300),
-
+    },
     selectSuggestion(movie) {
       this.searchQuery = movie.title
       this.showSuggestions = false
       this.$router.push(`/movie/${movie.id}`)
     },
-
     search() {
       if (this.searchQuery.trim()) {
         this.$router.push(`/search?query=${encodeURIComponent(this.searchQuery.trim())}`)
@@ -173,6 +203,7 @@ export default {
 .suggestion-title {
   font-weight: 500;
   margin-bottom: 4px;
+  color: #333;
 }
 
 .suggestion-year {

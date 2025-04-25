@@ -23,7 +23,7 @@ public class MovieTrendApplication {
 	public CommandLineRunner commandLineRunner() {
 		return args -> {
 			// 애플리케이션 시작 시 영화 데이터 인덱싱
-			movieIndexingService.indexTrendingMovies();
+			movieIndexingService.indexMovies();
 		};
 	}
 } 
