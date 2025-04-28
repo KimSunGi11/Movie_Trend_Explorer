@@ -27,6 +27,14 @@ public class CommentService {
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<CommentDto> getCommentsByUserId(Long userId) {
+        return commentRepository.findByUserIdOrderByCreatedAtDesc(userId)
+            .stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
+
     @Transactional
     public CommentDto createComment(Long movieId, String content, String username) {
         User user = userRepository.findByUsername(username)

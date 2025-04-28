@@ -56,10 +56,18 @@ public class UserService implements UserDetailsService {
         return userRepository.existsByUsername(username);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        userRepository.delete(user);
     }
 
     private UserDto convertToDto(User user) {
@@ -67,6 +75,7 @@ public class UserService implements UserDetailsService {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
         dto.setRole(user.getRole());
         return dto;
     }

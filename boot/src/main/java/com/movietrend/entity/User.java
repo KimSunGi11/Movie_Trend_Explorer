@@ -2,6 +2,7 @@ package com.movietrend.entity;
 
 import java.util.Collection;
 import java.util.List;
+import java.time.LocalDateTime;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Data
 @Builder
@@ -41,6 +43,9 @@ public class User implements UserDetails {
     private String name;
 
     private String role;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
