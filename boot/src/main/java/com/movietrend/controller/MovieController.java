@@ -61,7 +61,7 @@ public class MovieController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) String sort_by,
             @RequestParam(required = false) String with_genres,
-            @RequestParam(required = false) String language,
+            @RequestParam(required = false) String with_original_language,
             @RequestParam(required = false) Double vote_average_gte,
             @RequestParam(required = false) Integer vote_count_gte,
             @RequestParam(required = false) Integer with_runtime_gte,
@@ -70,7 +70,7 @@ public class MovieController {
             @RequestParam(required = false) Integer min_favorite_count) {
         
         return ResponseEntity.ok(tmdbService.discoverMovies(
-            page, sort_by, with_genres, language, 
+            page, sort_by, with_genres, with_original_language, 
             vote_average_gte, vote_count_gte,
             with_runtime_gte, with_runtime_lte, keyword,
             min_favorite_count
@@ -80,5 +80,11 @@ public class MovieController {
     @GetMapping("/autocomplete")
     public ResponseEntity<List<MovieDto>> autocomplete(@RequestParam String query) {
         return ResponseEntity.ok(movieSearchService.autocomplete(query));
+    }
+
+    @GetMapping("/korean/popular")
+    public ResponseEntity<MovieSearchResponse> getKoreanPopularMovies(
+            @RequestParam(defaultValue = "1") int page) {
+        return ResponseEntity.ok(tmdbService.getKoreanPopularMovies(page));
     }
 } 

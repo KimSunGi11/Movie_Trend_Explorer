@@ -287,17 +287,17 @@ export default {
           page: this.currentPage,
           sort_by: this.filters.sortBy,
           with_genres: this.filters.genres.join(','),
-          language: this.filters.language,
-          'vote_average.gte': this.filters.minUserScore,
+          with_original_language: this.filters.language,
+          vote_average_gte: this.filters.minUserScore,
           min_favorite_count: this.filters.minFavoriteCount,
           keyword: this.filters.keyword
         }
         
         if (this.filters.minRuntime) {
-          params['with_runtime.gte'] = this.filters.minRuntime
+          params.with_runtime_gte = this.filters.minRuntime
         }
         if (this.filters.maxRuntime) {
-          params['with_runtime.lte'] = this.filters.maxRuntime
+          params.with_runtime_lte = this.filters.maxRuntime
         }
         
         const response = await axios.get('http://localhost:8080/api/movies/discover', { params })
