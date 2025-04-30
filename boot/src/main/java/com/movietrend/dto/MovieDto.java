@@ -3,6 +3,8 @@ package com.movietrend.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @ToString
@@ -35,6 +37,16 @@ public class MovieDto {
     private String original_language;
     
     private Double popularity;
+    
+    @JsonProperty("runtime")
+    private Integer runtime;
+    
+    @JsonProperty("genres")
+    private List<GenreDto> genres;
+    
+    @JsonProperty("keywords")
+    private Map<String, Object> keywords;
+    private List<KeywordDto> keywordList;
 
     public Long getId() {
         return id;
@@ -98,5 +110,69 @@ public class MovieDto {
 
     public void setPopularity(Double popularity) {
         this.popularity = popularity;
+    }
+    
+    public String getBackdrop_path() {
+        return backdrop_path;
+    }
+
+    public void setBackdrop_path(String backdrop_path) {
+        this.backdrop_path = backdrop_path;
+    }
+    
+    public Boolean getAdult() {
+        return adult;
+    }
+
+    public void setAdult(Boolean adult) {
+        this.adult = adult;
+    }
+    
+    public String getOriginal_title() {
+        return original_title;
+    }
+
+    public void setOriginal_title(String original_title) {
+        this.original_title = original_title;
+    }
+    
+    public String getOriginal_language() {
+        return original_language;
+    }
+
+    public void setOriginal_language(String original_language) {
+        this.original_language = original_language;
+    }
+    
+    public Integer getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(Integer runtime) {
+        this.runtime = runtime;
+    }
+    
+    public List<GenreDto> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<GenreDto> genres) {
+        this.genres = genres;
+    }
+    
+    public Map<String, Object> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(Map<String, Object> keywords) {
+        this.keywords = keywords;
+    }
+
+    public List<KeywordDto> getKeywordList() {
+        return keywordList;
+    }
+
+    public void setKeywordList(List<KeywordDto> keywordList) {
+        this.keywordList = keywordList;
     }
 } 

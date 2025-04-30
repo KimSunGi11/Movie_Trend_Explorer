@@ -5,6 +5,7 @@ import com.movietrend.dto.MovieDto;
 import com.movietrend.dto.MovieListResponse;
 import com.movietrend.dto.GenreDto;
 import com.movietrend.dto.MovieSearchResponse;
+import com.movietrend.dto.KeywordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +67,7 @@ public class TmdbService {
     }
 
     public MovieDto getMovieDetails(Long movieId) {
+        // 영화 기본 정보 가져오기
         String url = UriComponentsBuilder
             .fromHttpUrl(tmdbConfig.getBaseUrl() + "/movie/" + movieId)
             .queryParam("api_key", tmdbConfig.getKey())
@@ -73,7 +75,36 @@ public class TmdbService {
             .build()
             .toUriString();
         
-        return restTemplate.getForObject(url, MovieDto.class);
+        MovieDto movieDto = restTemplate.getForObject(url, MovieDto.class);
+        
+        // 키워드 정보 별도로 가져오기
+        String keywordsUrl = UriComponentsBuilder
+            .fromHttpUrl(tmdbConfig.getBaseUrl() + "/movie/" + movieId + "/keywords")
+            .queryParam("api_key", tmdbConfig.getKey())
+            .build()
+            .toUriString();
+        
+        try {
+            ResponseEntity<Map> keywordsResponse = restTemplate.getForEntity(keywordsUrl, Map.class);
+            if (keywordsResponse.getStatusCode() == HttpStatus.OK && keywordsResponse.getBody() != null) {
+                List<Map<String, Object>> keywordsList = (List<Map<String, Object>>) keywordsResponse.getBody().get("keywords");
+                if (keywordsList != null) {
+                    List<KeywordDto> keywords = keywordsList.stream()
+                        .map(keyword -> {
+                            KeywordDto keywordDto = new KeywordDto();
+                            keywordDto.setId(Long.valueOf(keyword.get("id").toString()));
+                            keywordDto.setName((String) keyword.get("name"));
+                            return keywordDto;
+                        })
+                        .collect(Collectors.toList());
+                    movieDto.setKeywordList(keywords);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("키워드 정보를 가져오는 중 오류 발생: " + e.getMessage());
+        }
+        
+        return movieDto;
     }
 
     public List<GenreDto> getGenres() {
@@ -296,6 +327,57 @@ public class TmdbService {
         dto.setVote_average(((Number) movie.get("vote_average")).doubleValue());
         dto.setVote_count(((Number) movie.get("vote_count")).intValue());
         dto.setPopularity(((Number) movie.get("popularity")).doubleValue());
+        
+        // 추가 정보 설정
+        if (movie.get("runtime") != null) {
+            dto.setRuntime(((Number) movie.get("runtime")).intValue());
+        }
+        
+        if (movie.get("original_language") != null) {
+            dto.setOriginal_language((String) movie.get("original_language"));
+        }
+        
+        if (movie.get("original_title") != null) {
+            dto.setOriginal_title((String) movie.get("original_title"));
+        }
+        
+        if (movie.get("adult") != null) {
+            dto.setAdult((Boolean) movie.get("adult"));
+        }
+        
+        // 장르 정보 설정
+        if (movie.get("genres") != null) {
+            List<Map<String, Object>> genresList = (List<Map<String, Object>>) movie.get("genres");
+            List<GenreDto> genres = genresList.stream()
+                .map(genre -> {
+                    GenreDto genreDto = new GenreDto();
+                    genreDto.setId(Long.valueOf(genre.get("id").toString()));
+                    genreDto.setName((String) genre.get("name"));
+                    return genreDto;
+                })
+                .collect(Collectors.toList());
+            dto.setGenres(genres);
+        }
+        
+        // 키워드 정보 설정
+        if (movie.get("keywords") != null) {
+            Map<String, Object> keywordsMap = (Map<String, Object>) movie.get("keywords");
+            dto.setKeywords(keywordsMap);
+            
+            if (keywordsMap.get("keywords") != null) {
+                List<Map<String, Object>> keywordsList = (List<Map<String, Object>>) keywordsMap.get("keywords");
+                List<KeywordDto> keywords = keywordsList.stream()
+                    .map(keyword -> {
+                        KeywordDto keywordDto = new KeywordDto();
+                        keywordDto.setId(Long.valueOf(keyword.get("id").toString()));
+                        keywordDto.setName((String) keyword.get("name"));
+                        return keywordDto;
+                    })
+                    .collect(Collectors.toList());
+                dto.setKeywordList(keywords);
+            }
+        }
+        
         return dto;
     }
 

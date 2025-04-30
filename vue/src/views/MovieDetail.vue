@@ -41,6 +41,14 @@
                 <i class="fas fa-fire"></i>
                 {{ Math.round(movie.popularity) }}
               </span>
+              <span v-if="movie.runtime" class="runtime">
+                <i class="fas fa-clock"></i>
+                {{ movie.runtime }}분
+              </span>
+              <span v-if="movie.original_language" class="language">
+                <i class="fas fa-language"></i>
+                {{ getLanguageName(movie.original_language) }}
+              </span>
               <span v-if="isAuthenticated" class="favorite">
                 <button 
                   type="button" 
@@ -52,6 +60,24 @@
                   <span class="favorite-count">{{ favoriteCount }}</span>
                 </button>
               </span>
+            </div>
+            
+            <div class="genres" v-if="movie.genres && movie.genres.length">
+              <h3>장르</h3>
+              <div class="genre-tags">
+                <span v-for="genre in movie.genres" :key="genre.id" class="genre-tag">
+                  {{ genre.name }}
+                </span>
+              </div>
+            </div>
+
+            <div class="keywords" v-if="movie.keywordList && movie.keywordList.length">
+              <h3>키워드</h3>
+              <div class="keyword-tags">
+                <span v-for="keyword in movie.keywordList" :key="keyword.id" class="keyword-tag">
+                  {{ keyword.name }}
+                </span>
+              </div>
             </div>
             
             <div class="overview">
@@ -202,6 +228,20 @@ export default {
           this.error = '즐겨찾기 상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.';
         }
       }
+    },
+    getLanguageName(code) {
+      const languages = {
+        'ko': '한국어',
+        'en': '영어',
+        'ja': '일본어',
+        'zh': '중국어',
+        'fr': '프랑스어',
+        'de': '독일어',
+        'es': '스페인어',
+        'it': '이탈리아어',
+        'ru': '러시아어'
+      };
+      return languages[code] || code;
     }
   },
   watch: {
@@ -410,5 +450,40 @@ h1 {
 
 .favorite-btn:hover i {
   color: #ffc107;
+}
+
+.genres, .keywords {
+  margin: 1rem 0;
+}
+
+.genres h3, .keywords h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.genre-tags, .keyword-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.genre-tag, .keyword-tag {
+  background-color: #e9ecef;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.runtime, .language {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+}
+
+.runtime i, .language i {
+  color: #666;
 }
 </style> 
