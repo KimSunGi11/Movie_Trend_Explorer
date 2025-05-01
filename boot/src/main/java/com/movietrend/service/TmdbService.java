@@ -431,4 +431,47 @@ public class TmdbService {
         }
         return new MovieSearchResponse();
     }
+
+    public List<MovieDto> searchMoviesForAutocomplete(String query) {
+        if (query == null || query.length() < 2) {
+            return new ArrayList<>();
+        }
+
+        List<MovieDto> allResults = new ArrayList<>();
+        int maxPages = 3; // 최대 3페이지까지 검색
+
+        for (int page = 1; page <= maxPages; page++) {
+            String url = UriComponentsBuilder
+                .fromHttpUrl(tmdbConfig.getBaseUrl() + "/search/movie")
+                .queryParam("api_key", tmdbConfig.getKey())
+                .queryParam("query", query)
+                .queryParam("page", page)
+                .queryParam("language", "ko-KR")
+                .build()
+                .toUriString();
+
+            try {
+                ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+                if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                    List<Map<String, Object>> results = (List<Map<String, Object>>) response.getBody().get("results");
+                    if (results != null && !results.isEmpty()) {
+                        List<MovieDto> pageResults = results.stream()
+                            .map(this::convertToMovieDto)
+                            .collect(Collectors.toList());
+                        allResults.addAll(pageResults);
+                    } else {
+                        break; // 결과가 없으면 더 이상 페이지를 검색하지 않음
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("자동완성 검색 중 오류 발생: " + e.getMessage());
+                break;
+            }
+        }
+
+        // 최대 10개의 결과만 반환
+        return allResults.stream()
+            .limit(10)
+            .collect(Collectors.toList());
+    }
 } 

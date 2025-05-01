@@ -112,12 +112,25 @@
             <!-- 키워드 필터 -->
             <div class="filter-section">
               <h4>키워드</h4>
-              <input 
-                type="text" 
-                v-model="filters.keyword" 
-                class="form-control" 
-                placeholder="키워드 입력"
-              >
+              <div class="position-relative">
+                <input 
+                  type="text" 
+                  v-model="filters.keyword" 
+                  class="form-control" 
+                  placeholder="키워드 입력"
+                  @input="searchKeywords"
+                >
+                <div v-if="keywordSuggestions.length > 0" class="autocomplete-suggestions">
+                  <div 
+                    v-for="suggestion in keywordSuggestions" 
+                    :key="suggestion"
+                    class="suggestion-item"
+                    @click="selectKeyword(suggestion)"
+                  >
+                    {{ suggestion }}
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- 검색 버튼 -->
@@ -210,6 +223,7 @@ export default {
       defaultPoster: NoPoster,
       currentPage: 1,
       totalPages: 1,
+      keywordSuggestions: [],
       filters: {
         sortBy: 'popularity.desc',
         genres: [],
@@ -330,6 +344,28 @@ export default {
         month: 'long',
         day: 'numeric'
       })
+    },
+    async searchKeywords() {
+      if (this.filters.keyword.length < 1) {
+        this.keywordSuggestions = [];
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:8080/api/movies/keywords/autocomplete`, {
+          params: {
+            query: this.filters.keyword
+          }
+        });
+        this.keywordSuggestions = response.data;
+      } catch (error) {
+        console.error('키워드 자동완성 검색 중 오류 발생:', error);
+        this.keywordSuggestions = [];
+      }
+    },
+    selectKeyword(keyword) {
+      this.filters.keyword = keyword;
+      this.keywordSuggestions = [];
     }
   },
   watch: {
@@ -438,5 +474,27 @@ export default {
 .page-item.active .page-link {
   background-color: #007bff;
   border-color: #007bff;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #f8f9fa;
 }
 </style> 

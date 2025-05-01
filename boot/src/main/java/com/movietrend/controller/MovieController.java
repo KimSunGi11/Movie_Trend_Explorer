@@ -77,14 +77,25 @@ public class MovieController {
         ));
     }
 
-    @GetMapping("/autocomplete")
-    public ResponseEntity<List<MovieDto>> autocomplete(@RequestParam String query) {
-        return ResponseEntity.ok(movieSearchService.autocomplete(query));
+    @GetMapping("/search/autocomplete")
+    public ResponseEntity<List<MovieDto>> searchMoviesForAutocomplete(@RequestParam String query) {
+        List<MovieDto> results = tmdbService.searchMoviesForAutocomplete(query);
+        return ResponseEntity.ok(results);
     }
 
     @GetMapping("/korean/popular")
     public ResponseEntity<MovieSearchResponse> getKoreanPopularMovies(
             @RequestParam(defaultValue = "1") int page) {
         return ResponseEntity.ok(tmdbService.getKoreanPopularMovies(page));
+    }
+
+    @GetMapping("/autocomplete")
+    public ResponseEntity<List<MovieDto>> autocomplete(@RequestParam String query) {
+        return ResponseEntity.ok(movieSearchService.autocomplete(query));
+    }
+
+    @GetMapping("/keywords/autocomplete")
+    public ResponseEntity<List<String>> autocompleteKeywords(@RequestParam String query) {
+        return ResponseEntity.ok(movieSearchService.autocompleteKeywords(query));
     }
 } 
