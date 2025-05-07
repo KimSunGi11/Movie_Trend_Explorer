@@ -10,8 +10,16 @@ import com.movietrend.dto.MovieSearchResponse;
 import lombok.RequiredArgsConstructor;
 import com.movietrend.service.MovieSearchService;
 import com.movietrend.document.MovieDocument;
+import com.movietrend.service.UserBehaviorService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -19,6 +27,7 @@ import java.util.List;
 public class MovieController {
     private final TmdbService tmdbService;
     private final MovieSearchService movieSearchService;
+    private final UserBehaviorService userBehaviorService;
 
     @GetMapping("/trending")
     public MovieListResponse getTrendingMovies() {
@@ -97,5 +106,33 @@ public class MovieController {
     @GetMapping("/keywords/autocomplete")
     public ResponseEntity<List<String>> autocompleteKeywords(@RequestParam String query) {
         return ResponseEntity.ok(movieSearchService.autocompleteKeywords(query));
+    }
+
+    @GetMapping("/recommended")
+    @PreAuthorize("isAuthenticated()")
+    public List<MovieDto> getRecommendedMovies(@AuthenticationPrincipal UserDetails userDetails) {
+        return userBehaviorService.getRecommendedMovies(userDetails.getUsername());
+    }
+
+    @PostMapping("/record-view")
+    public ResponseEntity<Void> recordMovieView(
+            @RequestParam Long movieId,
+            @RequestParam String movieTitle,
+            @RequestParam List<String> genres,
+            @RequestParam List<String> keywords,
+            @RequestParam(defaultValue = "0") Integer viewDuration) {
+        
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+        userBehaviorService.recordMovieView(
+            username,
+            movieId,
+            movieTitle,
+            genres,
+            keywords,
+            viewDuration
+        );
+        
+        return ResponseEntity.ok().build();
     }
 } 

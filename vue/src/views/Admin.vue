@@ -18,32 +18,32 @@
           </div>
           <div v-else class="table-responsive">
             <table class="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>이름</th>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>이름</th>
                   <th>이메일</th>
                   <th>역할</th>
                   <th>작업</th>
-                </tr>
-              </thead>
-              <tbody>
+              </tr>
+            </thead>
+            <tbody>
                 <tr v-for="user in users" :key="user.id" @click="showUserComments(user)">
-                  <td>{{ user.id }}</td>
-                  <td>{{ user.name }}</td>
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
                   <td>{{ user.email }}</td>
-                  <td>{{ user.role }}</td>
+                <td>{{ user.role }}</td>
                   <td>
                     <button class="btn btn-sm btn-danger" @click.stop="deleteUser(user.id)">
                       삭제
                     </button>
                   </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
+    </div>
     </div>
 
     <!-- 유저 댓글 모달 -->
@@ -132,19 +132,19 @@ export default {
         }
         
         const response = await axios.get('http://localhost:8080/api/admin/users', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
         })
         this.users = response.data
-      } catch (error) {
+    } catch (error) {
         console.error('Error fetching users:', error)
         if (error.response?.status === 403) {
           this.error = '관리자 권한이 필요합니다.'
           this.$router.push('/')
-        } else {
+      } else {
           this.error = '유저 목록을 불러오는데 실패했습니다.'
-        }
+      }
       } finally {
         this.isLoading = false
       }
@@ -175,7 +175,7 @@ export default {
       } catch (error) {
         console.error('Error fetching user comments:', error)
         this.error = '댓글을 불러오는데 실패했습니다.'
-      } finally {
+    } finally {
         this.isLoading = false
       }
     },

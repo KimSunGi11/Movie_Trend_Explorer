@@ -26,6 +26,9 @@
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="korean-tab" data-bs-toggle="tab" data-bs-target="#korean" type="button" role="tab" aria-controls="korean" aria-selected="false">국내 영화</button>
           </li>
+          <li class="nav-item" role="presentation" v-if="isLoggedIn">
+            <button class="nav-link" id="recommended-tab" data-bs-toggle="tab" data-bs-target="#recommended" type="button" role="tab" aria-controls="recommended" aria-selected="false">맞춤 추천</button>
+          </li>
         </ul>
       </div>
     </div>
@@ -35,81 +38,81 @@
       <!-- 트렌드 영화 섹션 -->
       <div class="tab-pane fade show active" id="trending" role="tabpanel" aria-labelledby="trending-tab">
         <div class="container">
-          <!-- Loading State -->
-          <div v-if="isLoading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Loading movies...</p>
+        <!-- Loading State -->
+        <div v-if="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
+          <p class="mt-2">Loading movies...</p>
+        </div>
 
-          <!-- Error State -->
-          <div v-else-if="error" class="alert alert-danger" role="alert">
-            {{ error }}
-          </div>
+        <!-- Error State -->
+        <div v-else-if="error" class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
 
-          <!-- Movies Grid -->
-          <div v-else class="row">
-            <div v-for="movie in movies" :key="movie.id" class="col-md-3 mb-4">
-              <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card" @click="goToMovieDetail(movie.id)">
-                <img 
-                  :src="getImageUrl(movie.poster_path)" 
-                  :alt="movie.title"
-                  class="movie-poster"
-                  @error="handleImageError"
-                >
-                <div class="movie-info">
-                  <h3 class="movie-title">{{ movie.title }}</h3>
-                  <p class="movie-date">{{ formatDate(movie.release_date) }}</p>
-                  <div class="movie-rating">
-                    <span class="rating">★ {{ movie.vote_average?.toFixed(1) || 'N/A' }}</span>
-                    <span class="vote-count">({{ movie.vote_count || 0 }})</span>
-                  </div>
+        <!-- Movies Grid -->
+        <div v-else class="row">
+          <div v-for="movie in movies" :key="movie.id" class="col-md-3 mb-4">
+            <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card" @click="goToMovieDetail(movie.id)">
+              <img 
+                :src="getImageUrl(movie.poster_path)" 
+                :alt="movie.title"
+                class="movie-poster"
+                @error="handleImageError"
+              >
+              <div class="movie-info">
+                <h3 class="movie-title">{{ movie.title }}</h3>
+                <p class="movie-date">{{ formatDate(movie.release_date) }}</p>
+                <div class="movie-rating">
+                  <span class="rating">★ {{ movie.vote_average?.toFixed(1) || 'N/A' }}</span>
+                  <span class="vote-count">({{ movie.vote_count || 0 }})</span>
                 </div>
-              </router-link>
-            </div>
+              </div>
+            </router-link>
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- 인기 급상승 영화 섹션 -->
+    <!-- 인기 급상승 영화 섹션 -->
       <div class="tab-pane fade" id="popular" role="tabpanel" aria-labelledby="popular-tab">
-        <div class="container">
-          <!-- Loading State -->
-          <div v-if="isTrendingLoading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Loading trending movies...</p>
+      <div class="container">
+        <!-- Loading State -->
+        <div v-if="isTrendingLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
+          <p class="mt-2">Loading trending movies...</p>
+        </div>
 
-          <!-- Error State -->
-          <div v-else-if="trendingError" class="alert alert-danger" role="alert">
-            {{ trendingError }}
-          </div>
+        <!-- Error State -->
+        <div v-else-if="trendingError" class="alert alert-danger" role="alert">
+          {{ trendingError }}
+        </div>
 
-          <!-- Movies Grid -->
-          <div v-else class="row">
-            <div v-for="movie in trendingMovies" :key="movie.id" class="col-md-3 mb-4">
-              <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card" @click="goToMovieDetail(movie.id)">
-                <img 
-                  :src="getImageUrl(movie.poster_path)" 
-                  :alt="movie.title"
-                  class="movie-poster"
-                  @error="handleImageError"
-                >
-                <div class="movie-info">
-                  <h3 class="movie-title">{{ movie.title }}</h3>
-                  <p class="movie-date">{{ formatDate(movie.release_date) }}</p>
-                  <div class="movie-rating">
-                    <span class="rating">★ {{ movie.vote_average?.toFixed(1) || 'N/A' }}</span>
-                    <span class="vote-count">({{ movie.vote_count || 0 }})</span>
-                  </div>
+        <!-- Movies Grid -->
+        <div v-else class="row">
+          <div v-for="movie in trendingMovies" :key="movie.id" class="col-md-3 mb-4">
+            <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card" @click="goToMovieDetail(movie.id)">
+              <img 
+                :src="getImageUrl(movie.poster_path)" 
+                :alt="movie.title"
+                class="movie-poster"
+                @error="handleImageError"
+              >
+              <div class="movie-info">
+                <h3 class="movie-title">{{ movie.title }}</h3>
+                <p class="movie-date">{{ formatDate(movie.release_date) }}</p>
+                <div class="movie-rating">
+                  <span class="rating">★ {{ movie.vote_average?.toFixed(1) || 'N/A' }}</span>
+                  <span class="vote-count">({{ movie.vote_count || 0 }})</span>
                 </div>
-              </router-link>
-            </div>
+              </div>
+            </router-link>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- 국내 영화 섹션 -->
@@ -151,6 +154,51 @@
           </div>
         </div>
       </div>
+
+      <!-- 맞춤 추천 영화 섹션 -->
+      <div class="tab-pane fade" id="recommended" role="tabpanel" aria-labelledby="recommended-tab">
+        <div class="container">
+          <!-- Loading State -->
+          <div v-if="isRecommendedLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">맞춤 영화를 불러오는 중...</p>
+          </div>
+
+          <!-- Error State -->
+          <div v-else-if="recommendedError" class="alert alert-danger" role="alert">
+            {{ recommendedError }}
+          </div>
+
+          <!-- Empty State -->
+          <div v-else-if="recommendedMovies.length === 0" class="text-center py-5">
+            <p class="text-muted">아직 추천할 영화가 없습니다. 영화를 더 둘러보세요!</p>
+          </div>
+
+          <!-- Movies Grid -->
+          <div v-else class="row">
+            <div v-for="movie in recommendedMovies" :key="movie.id" class="col-md-3 mb-4">
+              <router-link :to="{ name: 'MovieDetail', params: { id: movie.id }}" class="movie-card" @click="goToMovieDetail(movie.id)">
+                <img 
+                  :src="getImageUrl(movie.poster_path)" 
+                  :alt="movie.title"
+                  class="movie-poster"
+                  @error="handleImageError"
+                >
+                <div class="movie-info">
+                  <h3 class="movie-title">{{ movie.title }}</h3>
+                  <p class="movie-date">{{ formatDate(movie.release_date) }}</p>
+                  <div class="movie-rating">
+                    <span class="rating">★ {{ movie.vote_average?.toFixed(1) || 'N/A' }}</span>
+                    <span class="vote-count">({{ movie.vote_count || 0 }})</span>
+                  </div>
+                </div>
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -170,21 +218,56 @@ export default {
       movies: [],
       trendingMovies: [],
       koreanMovies: [],
+      recommendedMovies: [],
       isLoading: false,
       isTrendingLoading: false,
       isKoreanLoading: false,
+      isRecommendedLoading: false,
       error: null,
       trendingError: null,
       koreanError: null,
-      defaultPoster: NoPoster
+      recommendedError: null,
+      defaultPoster: NoPoster,
+      isLoggedIn: false,
+      username: null
     }
   },
   created() {
+    this.checkLoginStatus()
     this.fetchPopularMovies()
     this.fetchTrendingMovies()
     this.fetchKoreanMovies()
   },
   methods: {
+    checkLoginStatus() {
+      const token = localStorage.getItem('token')
+      if (token) {
+        this.isLoggedIn = true
+        this.username = localStorage.getItem('username')
+        this.fetchRecommendedMovies()
+      }
+    },
+    async fetchRecommendedMovies() {
+      try {
+        this.isRecommendedLoading = true;
+        this.recommendedError = null;
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('로그인이 필요합니다.');
+        }
+        const response = await axios.get('http://localhost:8080/api/movies/recommended', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        this.recommendedMovies = response.data;
+      } catch (error) {
+        console.error('Error fetching recommended movies:', error);
+        this.recommendedError = '맞춤 영화를 불러오는데 실패했습니다.';
+      } finally {
+        this.isRecommendedLoading = false;
+      }
+    },
     async fetchPopularMovies() {
       this.isLoading = true
       this.error = null

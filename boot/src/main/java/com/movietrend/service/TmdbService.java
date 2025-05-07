@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -473,5 +474,117 @@ public class TmdbService {
         return allResults.stream()
             .limit(10)
             .collect(Collectors.toList());
+    }
+
+    public List<MovieDto> getRecommendedMovies(List<String> genres, List<String> keywords) {
+        System.out.println("TMDB 추천 영화 검색 시작");
+        System.out.println("입력된 장르: " + genres);
+        System.out.println("입력된 키워드: " + keywords);
+
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder
+            .fromHttpUrl(tmdbConfig.getBaseUrl() + "/discover/movie")
+            .queryParam("api_key", tmdbConfig.getKey())
+            .queryParam("language", "ko-KR")
+            .queryParam("sort_by", "popularity.desc");
+
+        // 장르 ID 매핑
+        if (!genres.isEmpty()) {
+            List<String> genreIds = genres.stream()
+                .map(genre -> {
+                    String id = switch (genre.toLowerCase()) {
+                        case "액션" -> "28";
+                        case "모험" -> "12";
+                        case "애니메이션" -> "16";
+                        case "코미디" -> "35";
+                        case "범죄" -> "80";
+                        case "다큐멘터리" -> "99";
+                        case "드라마" -> "18";
+                        case "가족" -> "10751";
+                        case "판타지" -> "14";
+                        case "역사" -> "36";
+                        case "공포" -> "27";
+                        case "음악" -> "10402";
+                        case "미스터리" -> "9648";
+                        case "로맨스" -> "10749";
+                        case "SF" -> "878";
+                        case "TV 영화" -> "10770";
+                        case "스릴러" -> "53";
+                        case "전쟁" -> "10752";
+                        case "서부" -> "37";
+                        default -> null;
+                    };
+                    System.out.println("장르 매핑: " + genre + " -> " + id);
+                    return id;
+                })
+                .filter(id -> id != null)
+                .collect(Collectors.toList());
+            
+            if (!genreIds.isEmpty()) {
+                String genreParam = String.join(",", genreIds);
+                System.out.println("장르 파라미터: " + genreParam);
+                urlBuilder.queryParam("with_genres", genreParam);
+            }
+        }
+
+        // 키워드 검색
+        if (!keywords.isEmpty()) {
+            List<String> keywordIds = new ArrayList<>();
+            for (String keyword : keywords) {
+                System.out.println("키워드 검색 시작: " + keyword);
+                String keywordSearchUrl = UriComponentsBuilder
+                    .fromHttpUrl(tmdbConfig.getBaseUrl() + "/search/keyword")
+                    .queryParam("api_key", tmdbConfig.getKey())
+                    .queryParam("query", keyword)
+                    .build()
+                    .toUriString();
+
+                try {
+                    ResponseEntity<Map> keywordResponse = restTemplate.getForEntity(keywordSearchUrl, Map.class);
+                    if (keywordResponse.getStatusCode() == HttpStatus.OK && keywordResponse.getBody() != null) {
+                        List<Map<String, Object>> keywordResults = (List<Map<String, Object>>) keywordResponse.getBody().get("results");
+                        if (!keywordResults.isEmpty()) {
+                            String keywordId = keywordResults.get(0).get("id").toString();
+                            System.out.println("키워드 ID 찾음: " + keyword + " -> " + keywordId);
+                            keywordIds.add(keywordId);
+                        } else {
+                            System.out.println("키워드 검색 결과 없음: " + keyword);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("키워드 검색 중 오류 발생: " + e.getMessage());
+                }
+            }
+
+            if (!keywordIds.isEmpty()) {
+                String keywordParam = String.join(",", keywordIds);
+                System.out.println("키워드 파라미터: " + keywordParam);
+                urlBuilder.queryParam("with_keywords", keywordParam);
+            }
+        }
+
+        urlBuilder.queryParam("page", 1);
+        String url = urlBuilder.build().toUriString();
+        System.out.println("TMDB API URL: " + url);
+
+        try {
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<Map<String, Object>> results = (List<Map<String, Object>>) response.getBody().get("results");
+                if (results != null) {
+                    List<MovieDto> movies = results.stream()
+                        .map(this::convertToMovieDto)
+                        .limit(20)
+                        .collect(Collectors.toList());
+                    System.out.println("검색된 영화 수: " + movies.size());
+                    return movies;
+                }
+            }
+            System.out.println("TMDB API 응답이 없거나 결과가 없습니다.");
+        } catch (Exception e) {
+            System.err.println("추천 영화 검색 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 } 

@@ -109,7 +109,9 @@ export default {
       error: null,
       defaultPoster: NoPoster,
       isFavorite: false,
-      favoriteCount: 0
+      favoriteCount: 0,
+      viewStartTime: null,
+      viewEndTime: null
     }
   },
   computed: {
@@ -127,6 +129,11 @@ export default {
   },
   created() {
     this.fetchMovieDetails()
+    this.startViewTimer()
+  },
+  beforeDestroy() {
+    this.stopViewTimer()
+    this.recordViewDuration()
   },
   methods: {
     async fetchMovieDetails() {
@@ -242,6 +249,35 @@ export default {
         'ru': '러시아어'
       };
       return languages[code] || code;
+    },
+    startViewTimer() {
+      this.viewStartTime = Date.now()
+    },
+    stopViewTimer() {
+      this.viewEndTime = Date.now()
+    },
+    recordViewDuration() {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const viewDuration = Math.floor((this.viewEndTime - this.viewStartTime) / 1000)
+      const genres = this.movie.genres?.map(g => g.name) || []
+      const keywords = this.movie.keywordList?.map(k => k.name) || []
+
+      axios.post('http://localhost:8080/api/movies/record-view', null, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        params: {
+          movieId: this.movie.id,
+          movieTitle: this.movie.title,
+          genres: genres.join(','),
+          keywords: keywords.join(','),
+          viewDuration
+        }
+      }).catch(error => {
+        console.error('Error recording view duration:', error)
+      })
     }
   },
   watch: {

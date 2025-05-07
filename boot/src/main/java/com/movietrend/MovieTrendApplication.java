@@ -15,9 +15,9 @@ public class MovieTrendApplication {
 
 	private final MovieIndexingService movieIndexingService;
 
-	public static void main(String[] args) {
-		SpringApplication.run(MovieTrendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MovieTrendApplication.class, args);
+    }
 
 	@Bean
 	public CommandLineRunner commandLineRunner() {
