@@ -118,22 +118,34 @@ export default {
 <style scoped>
 .favorites {
   padding: 2rem 0;
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
+  min-height: 100vh;
+}
+
+.favorites h2 {
+  color: #C4A77D;
+  font-weight: 600;
+  margin-bottom: 2rem;
 }
 
 .movie-card {
   display: block;
   text-decoration: none;
   color: inherit;
-  background: white;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
   height: 100%;
+  border: 1px solid rgba(196, 167, 125, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
+  border-color: #C4A77D;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .movie-poster {
@@ -144,16 +156,18 @@ export default {
 
 .movie-info {
   padding: 1rem;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
 }
 
 .movie-title {
   font-size: 1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  color: #C4A77D;
 }
 
 .movie-date {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
@@ -165,12 +179,26 @@ export default {
 }
 
 .rating {
-  color: #f5c518;
+  color: #C4A77D;
   font-weight: 600;
 }
 
 .vote-count {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.spinner-border {
+  color: #C4A77D !important;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  color: #ff6b6b;
 }
 </style> 

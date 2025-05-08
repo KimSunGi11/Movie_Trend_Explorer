@@ -81,7 +81,15 @@ export default {
 
 <style scoped>
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
+  border-bottom: 1px solid rgba(196, 167, 125, 0.1);
+}
+
+.navbar {
+  margin-bottom: 0;
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
+  border-bottom: 1px solid rgba(196, 167, 125, 0.1);
 }
 
 .navbar-brand {

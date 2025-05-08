@@ -383,15 +383,47 @@ export default {
 <style scoped>
 .advanced-search {
   padding: 2rem 0;
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
+  min-height: 100vh;
 }
 
 .filters-sidebar {
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   position: sticky;
   top: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(196, 167, 125, 0.2);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #C4A77D rgba(255, 255, 255, 0.1);
+}
+
+.filters-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.filters-sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.filters-sidebar::-webkit-scrollbar-thumb {
+  background: #C4A77D;
+  border-radius: 4px;
+}
+
+.filters-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #8B7355;
+}
+
+.filters-sidebar h3 {
+  color: #C4A77D;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
 }
 
 .filter-section {
@@ -401,28 +433,77 @@ export default {
 .filter-section h4 {
   font-size: 1rem;
   margin-bottom: 0.75rem;
-  color: #2c3e50;
+  color: #C4A77D;
+  font-weight: 500;
 }
 
-.genre-list {
-  max-height: 200px;
-  overflow-y: auto;
+.form-select, .form-control, .form-range {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(196, 167, 125, 0.3);
+  color: #FFFFFF;
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus, .form-control:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #C4A77D;
+  box-shadow: 0 0 0 3px rgba(196, 167, 125, 0.2);
+  outline: none;
+}
+
+.form-select option {
+  background: #2C3E50;
+  color: #FFFFFF;
+}
+
+.form-check-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.form-check-input {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(196, 167, 125, 0.3);
+}
+
+.form-check-input:checked {
+  background-color: #C4A77D;
+  border-color: #C4A77D;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #C4A77D, #8B7355);
+  border: none;
+  color: #FFFFFF;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #8B7355, #C4A77D);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .movie-card {
   display: block;
   text-decoration: none;
   color: inherit;
-  background: white;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
   height: 100%;
+  border: 1px solid rgba(196, 167, 125, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
+  border-color: #C4A77D;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .movie-poster {
@@ -433,16 +514,18 @@ export default {
 
 .movie-info {
   padding: 1rem;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
 }
 
 .movie-title {
   font-size: 1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  color: #C4A77D;
 }
 
 .movie-date {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
@@ -454,12 +537,12 @@ export default {
 }
 
 .rating {
-  color: #f5c518;
+  color: #C4A77D;
   font-weight: 600;
 }
 
 .vote-count {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
 }
 
@@ -468,33 +551,52 @@ export default {
 }
 
 .page-link {
-  color: #007bff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(196, 167, 125, 0.3);
+  color: #C4A77D;
+  transition: all 0.3s ease;
+}
+
+.page-link:hover {
+  background: rgba(196, 167, 125, 0.2);
+  border-color: #C4A77D;
+  color: #FFFFFF;
 }
 
 .page-item.active .page-link {
-  background-color: #007bff;
-  border-color: #007bff;
+  background: linear-gradient(135deg, #C4A77D, #8B7355);
+  border-color: #C4A77D;
+  color: #FFFFFF;
 }
 
 .autocomplete-suggestions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(196, 167, 125, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
 }
 
 .suggestion-item {
-  padding: 8px 12px;
-  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
 }
 
 .suggestion-item:hover {
-  background-color: #f8f9fa;
+  background: rgba(196, 167, 125, 0.2);
+  color: #FFFFFF;
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.spinner-border {
+  color: #C4A77D !important;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  color: #ff6b6b;
 }
 </style> 

@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
@@ -209,79 +212,104 @@ public class TmdbService {
                 // 전체 페이지의 영화를 가져오기 위해 여러 페이지를 조회
                 List<MovieDto> allMovies = new ArrayList<>();
                 int totalPages = (Integer) response.getBody().get("total_pages");
-                int maxPages = Math.min(totalPages, 5); // 최대 5페이지까지만 조회
+                int maxPages = Math.min(totalPages, 1000); // 최대 1000페이지까지 조회
                 
+                // 병렬 처리를 위한 스레드 풀 생성
+                int processors = Runtime.getRuntime().availableProcessors();
+                ExecutorService executor = Executors.newFixedThreadPool(processors);
+                List<Future<List<MovieDto>>> futures = new ArrayList<>();
+                
+                // 페이지를 병렬로 처리
                 for (int i = 1; i <= maxPages; i++) {
-                    UriComponentsBuilder pageUrlBuilder = UriComponentsBuilder
-                        .fromHttpUrl(tmdbConfig.getBaseUrl() + "/discover/movie")
-                        .queryParam("api_key", tmdbConfig.getKey())
-                        .queryParam("language", "ko-KR");
-                    
-                    if (i > 1) {
-                        pageUrlBuilder.queryParam("page", i);
-                    }
-                    if (sort_by != null) {
-                        pageUrlBuilder.queryParam("sort_by", sort_by);
-                    }
-                    if (with_genres != null && !with_genres.isEmpty()) {
-                        pageUrlBuilder.queryParam("with_genres", with_genres);
-                    }
-                    if (language != null && !language.isEmpty()) {
-                        pageUrlBuilder.queryParam("with_original_language", language);
-                    }
-                    if (vote_average_gte != null) {
-                        pageUrlBuilder.queryParam("vote_average.gte", vote_average_gte);
-                    }
-                    if (vote_count_gte != null) {
-                        pageUrlBuilder.queryParam("vote_count.gte", vote_count_gte);
-                    }
-                    if (with_runtime_gte != null && with_runtime_lte != null) {
-                        pageUrlBuilder.queryParam("with_runtime.gte", with_runtime_gte);
-                        pageUrlBuilder.queryParam("with_runtime.lte", with_runtime_lte);
-                    } else if (with_runtime_gte != null) {
-                        pageUrlBuilder.queryParam("with_runtime.gte", with_runtime_gte);
-                    } else if (with_runtime_lte != null) {
-                        pageUrlBuilder.queryParam("with_runtime.lte", with_runtime_lte);
-                    }
-                    
-                    String pageUrl = pageUrlBuilder.build().toUriString();
-                    
-                    if (keyword != null && !keyword.isEmpty()) {
-                        String keywordSearchUrl = UriComponentsBuilder
-                            .fromHttpUrl(tmdbConfig.getBaseUrl() + "/search/keyword")
+                    final int pageNum = i;
+                    futures.add(executor.submit(() -> {
+                        UriComponentsBuilder pageUrlBuilder = UriComponentsBuilder
+                            .fromHttpUrl(tmdbConfig.getBaseUrl() + "/discover/movie")
                             .queryParam("api_key", tmdbConfig.getKey())
-                            .queryParam("query", keyword)
-                            .build()
-                            .toUriString();
-                            
-                        ResponseEntity<Map> keywordResponse = restTemplate.getForEntity(keywordSearchUrl, Map.class);
+                            .queryParam("language", "ko-KR")
+                            .queryParam("page", pageNum);
                         
-                        if (keywordResponse.getStatusCode() == HttpStatus.OK && keywordResponse.getBody() != null) {
-                            List<Map<String, Object>> keywords = (List<Map<String, Object>>) keywordResponse.getBody().get("results");
-                            if (!keywords.isEmpty()) {
-                                String keywordId = keywords.get(0).get("id").toString();
-                                pageUrl = UriComponentsBuilder.fromHttpUrl(pageUrl)
-                                    .queryParam("with_keywords", keywordId)
-                                    .build()
-                                    .toUriString();
+                        if (sort_by != null) {
+                            pageUrlBuilder.queryParam("sort_by", sort_by);
+                        }
+                        if (with_genres != null && !with_genres.isEmpty()) {
+                            pageUrlBuilder.queryParam("with_genres", with_genres);
+                        }
+                        if (language != null && !language.isEmpty()) {
+                            pageUrlBuilder.queryParam("with_original_language", language);
+                        }
+                        if (vote_average_gte != null) {
+                            pageUrlBuilder.queryParam("vote_average.gte", vote_average_gte);
+                        }
+                        if (vote_count_gte != null) {
+                            pageUrlBuilder.queryParam("vote_count.gte", vote_count_gte);
+                        }
+                        if (with_runtime_gte != null && with_runtime_lte != null) {
+                            pageUrlBuilder.queryParam("with_runtime.gte", with_runtime_gte);
+                            pageUrlBuilder.queryParam("with_runtime.lte", with_runtime_lte);
+                        } else if (with_runtime_gte != null) {
+                            pageUrlBuilder.queryParam("with_runtime.gte", with_runtime_gte);
+                        } else if (with_runtime_lte != null) {
+                            pageUrlBuilder.queryParam("with_runtime.lte", with_runtime_lte);
+                        }
+                        
+                        String pageUrl = pageUrlBuilder.build().toUriString();
+                        
+                        if (keyword != null && !keyword.isEmpty()) {
+                            String keywordSearchUrl = UriComponentsBuilder
+                                .fromHttpUrl(tmdbConfig.getBaseUrl() + "/search/keyword")
+                                .queryParam("api_key", tmdbConfig.getKey())
+                                .queryParam("query", keyword)
+                                .build()
+                                .toUriString();
+                                
+                            ResponseEntity<Map> keywordResponse = restTemplate.getForEntity(keywordSearchUrl, Map.class);
+                            
+                            if (keywordResponse.getStatusCode() == HttpStatus.OK && keywordResponse.getBody() != null) {
+                                List<Map<String, Object>> keywords = (List<Map<String, Object>>) keywordResponse.getBody().get("results");
+                                if (!keywords.isEmpty()) {
+                                    String keywordId = keywords.get(0).get("id").toString();
+                                    pageUrl = UriComponentsBuilder.fromHttpUrl(pageUrl)
+                                        .queryParam("with_keywords", keywordId)
+                                        .build()
+                                        .toUriString();
+                                }
                             }
                         }
-                    }
-                    
-                    ResponseEntity<Map> pageResponse = restTemplate.getForEntity(pageUrl, Map.class);
-                    if (pageResponse.getStatusCode() == HttpStatus.OK && pageResponse.getBody() != null) {
-                        List<Map<String, Object>> results = (List<Map<String, Object>>) pageResponse.getBody().get("results");
-                        List<MovieDto> pageMovies = results.stream()
-                            .map(this::convertToMovieDto)
-                            .collect(Collectors.toList());
-                        allMovies.addAll(pageMovies);
+                        
+                        ResponseEntity<Map> pageResponse = restTemplate.getForEntity(pageUrl, Map.class);
+                        if (pageResponse.getStatusCode() == HttpStatus.OK && pageResponse.getBody() != null) {
+                            List<Map<String, Object>> results = (List<Map<String, Object>>) pageResponse.getBody().get("results");
+                            return results.stream()
+                                .map(this::convertToMovieDto)
+                                .collect(Collectors.toList());
+                        }
+                        return new ArrayList<MovieDto>();
+                    }));
+                }
+                
+                // 모든 결과 수집
+                for (Future<List<MovieDto>> future : futures) {
+                    try {
+                        allMovies.addAll(future.get());
+                    } catch (Exception e) {
+                        System.err.println("페이지 처리 중 오류 발생: " + e.getMessage());
                     }
                 }
+                
+                executor.shutdown();
+                
+                // 즐겨찾기 수를 한 번에 조회
+                Map<Long, Long> favoriteCounts = favoriteService.getFavoriteCounts(
+                    allMovies.stream()
+                        .map(MovieDto::getId)
+                        .collect(Collectors.toList())
+                );
                 
                 // 즐겨찾기 수로 필터링
                 List<MovieDto> filteredMovies = allMovies.stream()
                     .filter(movie -> {
-                        Long favoriteCount = favoriteService.getFavoriteCount(movie.getId());
+                        Long favoriteCount = favoriteCounts.getOrDefault(movie.getId(), 0L);
                         return favoriteCount >= min_favorite_count;
                     })
                     .collect(Collectors.toList());

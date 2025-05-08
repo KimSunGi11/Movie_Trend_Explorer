@@ -100,22 +100,25 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(to right, #01b4e4, #0d253f);
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
 }
 
 .signup-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 400px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(196, 167, 125, 0.2);
 }
 
 .signup-box h2 {
   text-align: center;
   margin-bottom: 2rem;
-  color: #0d253f;
+  color: #C4A77D;
+  font-weight: 600;
 }
 
 .form-group {
@@ -125,42 +128,84 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: #C4A77D;
+  font-weight: 500;
 }
 
 .form-control {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid rgba(196, 167, 125, 0.3);
+  border-radius: 8px;
   font-size: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #C4A77D;
+  box-shadow: 0 0 0 3px rgba(196, 167, 125, 0.2);
+  outline: none;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .btn-block {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  background: #01b4e4;
+  background: linear-gradient(135deg, #C4A77D, #8B7355);
   border: none;
-  border-radius: 4px;
-  color: white;
+  border-radius: 8px;
+  color: #FFFFFF;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  font-weight: 600;
 }
 
 .btn-block:hover {
-  background: #0d253f;
+  background: linear-gradient(135deg, #8B7355, #C4A77D);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .alert {
   padding: 0.75rem;
   margin-bottom: 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .alert-danger {
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-  color: #721c24;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  color: #ff6b6b;
+}
+
+.mt-3 {
+  margin-top: 1.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-center p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.text-center a {
+  color: #C4A77D;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.text-center a:hover {
+  color: #8B7355;
+  text-decoration: underline;
 }
 </style> 

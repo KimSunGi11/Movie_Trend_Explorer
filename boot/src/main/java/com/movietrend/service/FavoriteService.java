@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +41,16 @@ public class FavoriteService {
     @Transactional(readOnly = true)
     public long getFavoriteCount(Long movieId) {
         return favoriteRepository.countByMovieId(movieId);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, Long> getFavoriteCounts(List<Long> movieIds) {
+        List<Object[]> results = favoriteRepository.countByMovieIds(movieIds);
+        return results.stream()
+            .collect(Collectors.toMap(
+                result -> ((Number) result[0]).longValue(),
+                result -> ((Number) result[1]).longValue()
+            ));
     }
 
     @Transactional

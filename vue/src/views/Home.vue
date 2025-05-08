@@ -361,27 +361,53 @@ export default {
 </script>
 
 <style scoped>
+.home {
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
+  min-height: 100vh;
+}
+
 .hero {
-  background: linear-gradient(to right, #01b4e4, #0d253f);
-  color: white;
-  padding: 4rem 0;
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
+  color: #C4A77D;
+  padding: 6rem 0;
+  margin-bottom: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(196, 167, 125, 0.1), rgba(43, 62, 80, 0.1));
+  z-index: 1;
 }
 
 .hero-content {
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
   margin-bottom: 1rem;
+  color: #C4A77D;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .hero h2 {
   font-size: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.5px;
 }
 
 .search-container {
@@ -390,32 +416,109 @@ export default {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  z-index: 3;
 }
 
 .search-container :deep(.search-bar) {
   width: 100%;
   max-width: 800px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 50px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
 }
 
 .search-container :deep(.search-input) {
-  font-size: 1.2rem;
-  padding: 1rem;
-  border-radius: 30px;
-  border: none;
-  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(196, 167, 125, 0.3);
+  color: #1A1A1A;
+  font-size: 1.1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.search-container :deep(.search-input):focus {
+  background: #FFFFFF;
+  border-color: #C4A77D;
+  box-shadow: 0 0 0 3px rgba(196, 167, 125, 0.2);
 }
 
 .search-container :deep(.search-button) {
-  padding: 0 2rem;
-  border-radius: 30px;
-  font-size: 1.2rem;
+  background: linear-gradient(135deg, #C4A77D, #8B7355);
+  border: none;
+  color: #FFFFFF;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-container :deep(.search-button):hover {
+  background: linear-gradient(135deg, #8B7355, #C4A77D);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.search-container :deep(.suggestions) {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(145deg, #ffffff, #f8f8f8);
+  border: 1px solid rgba(196, 167, 125, 0.2);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.search-container :deep(.suggestion-item) {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(196, 167, 125, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.search-container :deep(.suggestion-item:hover) {
+  background: linear-gradient(145deg, #f5f5f5, #ffffff);
+}
+
+.search-container :deep(.suggestion-poster) {
+  width: 45px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 1rem;
+}
+
+.search-container :deep(.suggestion-info) {
+  flex: 1;
+}
+
+.search-container :deep(.suggestion-title) {
+  color: #1A1A1A;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.search-container :deep(.suggestion-year) {
+  color: #8B7355;
+  font-size: 0.9rem;
 }
 
 .category-tabs {
-  margin-bottom: 2rem;
-  background-color: #f8f9fa;
-  padding: 1rem 0;
-  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 0;
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
+  padding: 2rem 0;
+  border-bottom: 1px solid rgba(196, 167, 125, 0.1);
 }
 
 .nav-tabs {
@@ -426,45 +529,51 @@ export default {
 .nav-tabs .nav-link {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #343a40;
+  color: #C4A77D;
   border: none;
   padding: 0.75rem 1.5rem;
   margin-right: 1rem;
   border-radius: 30px;
   transition: all 0.3s ease;
-  background-color: #e9ecef;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .nav-tabs .nav-link:hover {
-  color: #01b4e4;
-  background-color: #dde2e6;
+  color: #FFFFFF;
+  background: rgba(196, 167, 125, 0.2);
 }
 
 .nav-tabs .nav-link.active {
-  color: white;
-  background-color: #01b4e4;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #C4A77D, #8B7355);
   border: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .tab-content {
   padding: 2rem 0;
+  background: linear-gradient(135deg, #1A1A1A, #2C3E50);
 }
 
 .movie-card {
   display: block;
   text-decoration: none;
   color: inherit;
-  background: white;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
   height: 100%;
+  border: 1px solid rgba(196, 167, 125, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
+  border-color: #C4A77D;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .movie-poster {
@@ -475,16 +584,18 @@ export default {
 
 .movie-info {
   padding: 1rem;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
 }
 
 .movie-title {
   font-size: 1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  color: #C4A77D;
 }
 
 .movie-date {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
@@ -496,12 +607,29 @@ export default {
 }
 
 .rating {
-  color: #f5c518;
+  color: #C4A77D;
   font-weight: 600;
 }
 
 .vote-count {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
+}
+
+/* 로딩 스피너 스타일 수정 */
+.spinner-border {
+  color: #C4A77D !important;
+}
+
+/* 에러 메시지 스타일 수정 */
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.2);
+  color: #ff6b6b;
+}
+
+/* 빈 상태 메시지 스타일 수정 */
+.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 </style> 
