@@ -20,6 +20,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Map;
 import com.movietrend.config.TmdbConfig;
 import org.springframework.web.client.RestTemplate;
+import java.util.Set;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +41,9 @@ public class MovieSearchService {
         }
 
         List<MovieDto> results = new ArrayList<>();
+        Set<Long> addedMovieIds = new HashSet<>();
 
-        // 1. 먼저 Elasticsearch에서 검색
+        // 1. Elasticsearch에서 검색 (한글 검색 최적화)
         Criteria criteria = new Criteria("title").startsWith(query)
             .or("suggestions").startsWith(query);
         
@@ -51,11 +54,17 @@ public class MovieSearchService {
         List<MovieDto> elasticResults = searchHits.stream()
             .map(hit -> convertToMovieDto(hit.getContent()))
             .collect(Collectors.toList());
-        results.addAll(elasticResults);
+
+        // Elasticsearch 결과 추가
+        for (MovieDto movie : elasticResults) {
+            if (addedMovieIds.add(movie.getId())) {
+                results.add(movie);
+            }
+        }
 
         // 2. Elasticsearch 결과가 10개 미만이면 TMDB API에서 추가 검색
         if (results.size() < 10) {
-            int maxPages = 3; // 최대 3페이지까지 검색
+            int maxPages = 2; // 최대 2페이지까지 검색
             int remaining = 10 - results.size();
 
             for (int page = 1; page <= maxPages; page++) {
@@ -75,7 +84,7 @@ public class MovieSearchService {
                         if (tmdbResults != null && !tmdbResults.isEmpty()) {
                             List<MovieDto> pageResults = tmdbResults.stream()
                                 .map(this::convertToMovieDto)
-                                .filter(movie -> !results.stream().anyMatch(r -> r.getId().equals(movie.getId()))) // 중복 제거
+                                .filter(movie -> addedMovieIds.add(movie.getId())) // 중복 제거
                                 .limit(remaining)
                                 .collect(Collectors.toList());
                             results.addAll(pageResults);

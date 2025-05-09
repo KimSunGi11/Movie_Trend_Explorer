@@ -212,7 +212,7 @@ public class TmdbService {
                 // 전체 페이지의 영화를 가져오기 위해 여러 페이지를 조회
                 List<MovieDto> allMovies = new ArrayList<>();
                 int totalPages = (Integer) response.getBody().get("total_pages");
-                int maxPages = Math.min(totalPages, 1000); // 최대 1000페이지까지 조회
+                int maxPages = Math.min(totalPages, 50); // 최대 50페이지까지 조회
                 
                 // 병렬 처리를 위한 스레드 풀 생성
                 int processors = Runtime.getRuntime().availableProcessors();

@@ -31,32 +31,39 @@ public class MovieIndexingService {
             allMovies.addAll(trendingMovies);
             log.info("Collected {} trending movies", trendingMovies.size());
 
-            // 2. 현재 상영중인 영화 수집 (3페이지)
-            for (int i = 1; i <= 3; i++) {
+            // 2. 현재 상영중인 영화 수집 (5페이지)
+            for (int i = 1; i <= 5; i++) {
                 List<MovieDto> nowPlayingMovies = tmdbService.getNowPlayingMovies(i).getResults();
                 allMovies.addAll(nowPlayingMovies);
                 log.info("Collected {} now playing movies from page {}", nowPlayingMovies.size(), i);
             }
 
-            // 3. 인기 영화 수집 (3페이지)
-            for (int i = 1; i <= 3; i++) {
+            // 3. 인기 영화 수집 (5페이지)
+            for (int i = 1; i <= 5; i++) {
                 List<MovieDto> popularMovies = tmdbService.getPopularMovies(i).getResults();
                 allMovies.addAll(popularMovies);
                 log.info("Collected {} popular movies from page {}", popularMovies.size(), i);
             }
 
-            // 4. 평점 높은 영화 수집 (3페이지)
-            for (int i = 1; i <= 3; i++) {
+            // 4. 평점 높은 영화 수집 (5페이지)
+            for (int i = 1; i <= 5; i++) {
                 List<MovieDto> topRatedMovies = tmdbService.getTopRatedMovies(i).getResults();
                 allMovies.addAll(topRatedMovies);
                 log.info("Collected {} top rated movies from page {}", topRatedMovies.size(), i);
             }
 
-            // 5. 개봉 예정 영화 수집 (2페이지)
-            for (int i = 1; i <= 2; i++) {
+            // 5. 개봉 예정 영화 수집 (3페이지)
+            for (int i = 1; i <= 3; i++) {
                 List<MovieDto> upcomingMovies = tmdbService.getUpcomingMovies(i).getResults();
                 allMovies.addAll(upcomingMovies);
                 log.info("Collected {} upcoming movies from page {}", upcomingMovies.size(), i);
+            }
+
+            // 6. 한국 영화 수집 (5페이지)
+            for (int i = 1; i <= 5; i++) {
+                List<MovieDto> koreanMovies = tmdbService.getKoreanPopularMovies(i).getResults();
+                allMovies.addAll(koreanMovies);
+                log.info("Collected {} Korean movies from page {}", koreanMovies.size(), i);
             }
 
             // 수집된 모든 영화를 인덱싱
